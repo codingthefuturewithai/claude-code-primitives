@@ -1,0 +1,12 @@
+{
+  "name": "primitives-toolkit",
+  "version": "1.0.0",
+  "description": "Comprehensive toolkit for creating and managing Claude Code primitives with guides and examples",
+  "author": {
+    "name": "Tim Kitchens",
+    "url": "https://github.com/Coding-the-Future-of-AI"
+  },
+  "repository": "https://github.com/Coding-the-Future-of-AI/claude-code-primitives",
+  "license": "MIT",
+  "keywords": ["primitives", "skills", "commands", "subagents", "hooks", "mcp", "plugins", "toolkit"]
+}
