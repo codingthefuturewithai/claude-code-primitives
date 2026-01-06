@@ -55,17 +55,27 @@ Skills are auto-activated capabilities that Claude uses when appropriate. They s
 Slash commands are user-invoked commands (e.g., `/create-primitive`). They provide explicit control over Claude's actions.
 
 ### Available Guides:
-- **commands-complete-guide.md** - *(To be created)*
-  - YAML frontmatter format
-  - Argument parsing
-  - Tool restrictions
-  - Model preferences
+- **[slash-commands-complete-guide.md](commands/slash-commands-complete-guide.md)** - Complete reference
+  - When to use vs Skills/Subagents
+  - YAML frontmatter format (all fields)
+  - Argument handling ($ARGUMENTS, $1, $2)
+  - Tool restriction patterns
+  - Advanced features (bash execution, file references)
+  - Namespacing strategies
+  - Project vs personal scope decisions
+  - SlashCommand tool (programmatic invocation)
+  - 5 anti-patterns with explanations
+  - 5 common mistakes
+  - Character budget management
+  - Plugin & MCP command patterns
+  - Testing guidance
 
 ### When to Use:
 - User wants explicit control
 - Simple, focused operations
 - Single-step or linear workflows
 - No need for auto-activation
+- Repeated prompts used frequently
 
 ## Subagents
 
