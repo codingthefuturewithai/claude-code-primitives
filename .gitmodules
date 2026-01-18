@@ -1,0 +1,6 @@
+[submodule "external/anthropic-skills"]
+	path = external/anthropic-skills
+	url = https://github.com/anthropics/skills.git
+[submodule "external/rag-memory"]
+	path = external/rag-memory
+	url = https://github.com/codingthefuturewithai/rag-memory.git
