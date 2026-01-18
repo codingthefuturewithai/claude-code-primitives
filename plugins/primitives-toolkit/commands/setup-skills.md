@@ -1,9 +1,9 @@
 ---
-name: setup
-description: Set up plugin skills by creating necessary symlinks. Run this once after installing the plugin.
+name: setup-skills
+description: Create symlinks for primitives-toolkit skills. Run once after installing the plugin to enable skills.
 ---
 
-# Plugin Setup Command
+# Primitives Toolkit - Setup Skills
 
 Run the appropriate setup script based on the operating system to create symlinks for plugin skills.
 
