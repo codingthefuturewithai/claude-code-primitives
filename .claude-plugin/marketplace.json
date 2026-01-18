@@ -10,13 +10,7 @@
       "name": "primitives-toolkit",
       "description": "Complete toolkit: devflow commands (JIRA integration), knowledge management (RAG Memory + Confluence), PM commands, and protective hooks",
       "version": "1.0.0",
-      "source": "./plugins/primitives-toolkit",
-      "strict": false,
-      "skills": [
-        "./plugins/primitives-toolkit/skills/knowledge-management",
-        "./plugins/primitives-toolkit/skills/frontend-design",
-        "./plugins/primitives-toolkit/skills/skill-creator"
-      ]
+      "source": "./plugins/primitives-toolkit"
     }
   ]
 }
