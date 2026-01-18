@@ -16,6 +16,5 @@
     "knowledge-management",
     "workflow",
     "project-management"
-  ],
-  "hooks": "./hooks/hooks.json"
+  ]
 }
