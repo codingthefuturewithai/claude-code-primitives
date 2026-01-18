@@ -1,5 +1,4 @@
 ---
-name: setup-skills
 description: Create symlinks for primitives-toolkit skills. Run once after installing the plugin to enable skills.
 ---
 
