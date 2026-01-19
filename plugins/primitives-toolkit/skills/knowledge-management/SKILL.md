@@ -1,5 +1,5 @@
 ---
-name: knowledge-management
+name: primitives-toolkit:knowledge-management
 description: Store or update content in RAG Memory or Confluence. Use when user wants to save, add, store, update, or capture content to RAG Memory, Confluence, external knowledge base, or external documentation.
 user-invocable: true
 ---
