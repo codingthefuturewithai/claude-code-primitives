@@ -52,3 +52,32 @@ Do NOT use `getPagesInConfluenceSpace()` as a search substitute. It lists pages,
 ### Updating vs Creating
 
 If search finds similar content, offer to update the existing page instead of creating a duplicate. Use `updateConfluencePage()` with the page ID from search results.
+
+## Updating Existing Pages
+
+When search finds a related page and user wants to update:
+
+1. Extract `pageId` from search results
+2. Get current page content via `getConfluencePage(cloudId, pageId)` if needed
+3. Append new content with timestamp
+4. Call `updateConfluencePage(cloudId, pageId, title, updatedContent)`
+
+### getConfluencePage(cloudId, pageId)
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| cloudId | string | Yes | From getAccessibleAtlassianResources |
+| pageId | string | Yes | Page ID from search results |
+
+Returns page content. Use when you need existing content before appending.
+
+### Append Format
+
+```markdown
+[existing content]
+
+---
+
+**Added [YYYY-MM-DD HH:MM]:**
+[new content]
+```
