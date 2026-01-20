@@ -182,6 +182,19 @@ Some features require MCP servers to be configured:
 | Knowledge management | `rag-memory` and/or `atlassian` |
 | RAG Memory commands | `rag-memory` |
 
+#### Installing RAG Memory MCP Server (Required)
+
+The RAG Memory MCP server is required for knowledge management features. Install it from the private repository:
+
+**Repository:** https://github.com/codingthefuturewithai/rag-memory.git
+
+After setting up the RAG Memory server, add it to Claude Code:
+```bash
+claude mcp add --transport http --scope user rag-memory http://localhost:18000/mcp
+```
+
+> **Note:** The port (`18000`) may vary based on your RAG Memory server configuration. Check your server's settings and adjust the URL accordingly.
+
 ### Permissions
 The plugin will prompt for tool permissions on first use. You can pre-approve them in your Claude Code settings.
 
