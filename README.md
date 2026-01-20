@@ -61,12 +61,14 @@ Skills are intelligent workflows that Claude invokes based on context. They prov
 | `knowledge-management` | When you want to save/store content | Routes content to RAG Memory or Confluence with intelligent organization |
 | `frontend-design` | When building UI components | Creates distinctive, production-grade interfaces with bold aesthetics |
 | `skill-creator` | When creating new skills | Guides you through building effective Claude Code skills |
+| `repo-explorer` | When analyzing a GitHub repository | Explores and analyzes codebase structure, architecture, and key files |
 
 **Usage:** Skills activate automatically when Claude detects relevant intent, or invoke directly:
 ```
 /knowledge-management --rag "Store this API documentation"
 /knowledge-management --confluence "Add to team wiki"
 /frontend-design "Create a dashboard for analytics"
+/repo-explorer https://github.com/some/repo
 ```
 
 ### Commands (Explicit Actions)
@@ -140,6 +142,12 @@ Hooks run automatically before certain actions to protect your data.
 │  │ to RAG Memory   │ │ distinctive UI  │ │ development     │   │
 │  │ or Confluence   │ │ components      │ │                 │   │
 │  └─────────────────┘ └─────────────────┘ └─────────────────┘   │
+│  ┌─────────────────┐                                            │
+│  │ repo-explorer   │                                            │
+│  │                 │                                            │
+│  │ Analyzes GitHub │                                            │
+│  │ repos & code    │                                            │
+│  └─────────────────┘                                            │
 │                                                                 │
 │  COMMANDS (Explicit Actions)                                    │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌───────────┐ │
@@ -181,6 +189,7 @@ Some features require MCP servers to be configured:
 | PM commands | `atlassian` (Confluence) |
 | Knowledge management | `rag-memory` and/or `atlassian` |
 | RAG Memory commands | `rag-memory` |
+| Repo Explorer | `code-understanding` |
 
 #### Installing RAG Memory MCP Server (Required)
 
@@ -194,6 +203,19 @@ claude mcp add --transport http --scope user rag-memory http://localhost:18000/m
 ```
 
 > **Note:** The port (`18000`) may vary based on your RAG Memory server configuration. Check your server's settings and adjust the URL accordingly.
+
+#### Installing Code Understanding MCP Server (Required for Repo Explorer)
+
+The Code Understanding MCP server enables repository analysis features. Install it from the repository:
+
+**Repository:** https://github.com/codingthefuturewithai/mcp-code-understanding.git
+
+After setting up the Code Understanding server, add it to Claude Code:
+```bash
+claude mcp add --transport sse --scope user code-understanding http://localhost:3001/sse
+```
+
+> **Note:** The port (`3001`) may vary based on your server configuration. Check your server's settings and adjust the URL accordingly.
 
 ### Permissions
 The plugin will prompt for tool permissions on first use. You can pre-approve them in your Claude Code settings.
@@ -237,6 +259,9 @@ claude-code-primitives/
 │       │   ├── frontend-design/
 │       │   │   └── SKILL.md
 │       │   ├── knowledge-management/
+│       │   │   ├── SKILL.md
+│       │   │   └── references/
+│       │   ├── repo-explorer/
 │       │   │   ├── SKILL.md
 │       │   │   └── references/
 │       │   └── skill-creator/
