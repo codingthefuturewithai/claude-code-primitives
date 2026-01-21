@@ -228,6 +228,9 @@ The plugin will prompt for tool permissions on first use. You can pre-approve th
 claude-code-primitives/
 ├── .claude-plugin/
 │   └── marketplace.json          # Plugin marketplace definition
+├── primitives/
+│   └── skills/                   # Standalone skills (not bundled in plugin)
+│       └── ctfai-brand/          # Brand guidelines skill
 ├── plugins/
 │   └── primitives-toolkit/
 │       ├── .claude-plugin/
@@ -271,6 +274,34 @@ claude-code-primitives/
 │           └── setup-skills.py   # Standalone setup script
 └── README.md
 ```
+
+---
+
+## Standalone Skills
+
+The `primitives/skills/` directory contains standalone skills that are **not bundled** with the plugin. These are typically specialized or personal-use skills that users can install individually.
+
+### Available Standalone Skills
+
+| Skill | Description |
+|-------|-------------|
+| `ctfai-brand` | Brand guidelines for "Coding the Future with AI" - applies consistent branding to PDFs, websites, React themes, etc. |
+
+### Installing Standalone Skills
+
+Claude Code loads skills from `~/.claude/skills/`. To install a standalone skill:
+
+**Option 1: Symlink (Recommended for Development)**
+```bash
+ln -s /path/to/claude-code-primitives/primitives/skills/ctfai-brand ~/.claude/skills/ctfai-brand
+```
+
+**Option 2: Copy**
+```bash
+cp -r /path/to/claude-code-primitives/primitives/skills/ctfai-brand ~/.claude/skills/
+```
+
+After installing, restart Claude Code. The skill will activate automatically based on context or can be invoked with `/<skill-name>`.
 
 ---
 
