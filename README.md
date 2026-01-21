@@ -228,9 +228,9 @@ The plugin will prompt for tool permissions on first use. You can pre-approve th
 claude-code-primitives/
 ├── .claude-plugin/
 │   └── marketplace.json          # Plugin marketplace definition
-├── primitives/
-│   └── skills/                   # Standalone skills (not bundled in plugin)
-│       └── ctfai-brand/          # Brand guidelines skill
+├── skills/                       # Standalone skills (installable via ai-agent-skills)
+│   └── ctfai-brand/              # Brand guidelines skill
+├── primitives/                   # Reference primitives
 ├── plugins/
 │   └── primitives-toolkit/
 │       ├── .claude-plugin/
@@ -279,7 +279,7 @@ claude-code-primitives/
 
 ## Standalone Skills
 
-The `primitives/skills/` directory contains standalone skills that are **not bundled** with the plugin. These are typically specialized or personal-use skills that users can install individually.
+The `skills/` directory contains standalone skills that are **not bundled** with the plugin. These are typically specialized or personal-use skills that users can install individually.
 
 ### Available Standalone Skills
 
@@ -292,7 +292,7 @@ The `primitives/skills/` directory contains standalone skills that are **not bun
 Install standalone skills directly from GitHub using `ai-agent-skills`:
 
 ```bash
-npx ai-agent-skills install codingthefuturewithai/claude-code-primitives/primitives/skills/ctfai-brand --agent claude
+npx ai-agent-skills install codingthefuturewithai/claude-code-primitives/ctfai-brand --agent claude
 ```
 
 After installing, restart Claude Code. The skill will activate automatically based on context or can be invoked with `/ctfai-brand`.
