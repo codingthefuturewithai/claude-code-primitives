@@ -163,10 +163,7 @@ Only touch RAG Memory MCP server. Do NOT call any Confluence/Atlassian tools.
         - content formatted as: `## YYYY-MM-DD HH:MM\n[content]\n\n---\n`
    4. Confirm success and END
 
-**R8.** Ingest content as-is (do not expand or modify):
-   ```
-   ingest_text(content="[user's exact content]", collection_name="[chosen]", topic="[chosen]", ...)
-   ```
+**R8.** Ingest the content as-is (do not expand or modify). Discover the available RAG Memory ingestion tools and select the appropriate one based on input type (file path, URL, or raw text).
 
 **R9.** If no preference existed in R5, offer to save one:
    "Would you like me to remember that [domain] content goes to [collection]?"
