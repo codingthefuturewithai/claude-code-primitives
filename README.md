@@ -228,74 +228,73 @@ The plugin will prompt for tool permissions on first use. You can pre-approve th
 claude-code-primitives/
 ├── .claude-plugin/
 │   └── marketplace.json          # Plugin marketplace definition
-├── skills/                       # Standalone skills (installable via ai-agent-skills)
-│   └── ctfai-brand/              # Brand guidelines skill
-├── primitives/                   # Reference primitives
+├── commands/                     # Shared commands (source of truth)
+│   ├── devflow/                  # JIRA workflow commands
+│   ├── docs/                     # Documentation commands
+│   ├── pm/                       # Project management commands
+│   └── rag-memory/               # RAG Memory setup commands
+├── hooks/                        # Shared hooks (source of truth)
+│   └── kb-modification-approval.py
+├── skills/                       # Shared skills (source of truth)
+│   ├── ctfai-brand/              # Brand guidelines (standalone)
+│   ├── frontend-design/          # UI creation skill
+│   ├── knowledge-management/     # Content routing skill
+│   └── skill-creator/            # Skill development guide
 ├── plugins/
 │   └── primitives-toolkit/
 │       ├── .claude-plugin/
 │       │   └── plugin.json       # Plugin manifest
 │       ├── commands/
-│       │   ├── admin/            # Administrative commands
-│       │   │   └── setup-skills.md
-│       │   ├── devflow/          # JIRA workflow commands
-│       │   │   ├── fetch-issue.md
-│       │   │   ├── create-issue.md
-│       │   │   ├── plan-work.md
-│       │   │   ├── implement-plan.md
-│       │   │   ├── complete-issue.md
-│       │   │   ├── post-merge.md
-│       │   │   ├── security-review.md
-│       │   │   └── workflow-guide.md
-│       │   ├── docs/             # Documentation commands
-│       │   │   └── reference-audit.md
-│       │   ├── pm/               # Project management commands
-│       │   │   ├── roadmap.md
-│       │   │   └── backlog.md
-│       │   └── rag-memory/       # RAG Memory setup commands
-│       │       ├── setup-collections.md
-│       │       └── create-agent-preferences.md
+│       │   ├── admin/            # Plugin-specific commands
+│       │   ├── devflow/ → ../../../commands/devflow
+│       │   ├── docs/ → ../../../commands/docs
+│       │   ├── pm/ → ../../../commands/pm
+│       │   └── rag-memory/ → ../../../commands/rag-memory
 │       ├── hooks/
-│       │   ├── hooks.json        # Hook definitions
-│       │   └── kb-modification-approval.py
+│       │   ├── hooks.json        # Plugin hook config
+│       │   └── kb-modification-approval.py → ../../../hooks/...
 │       ├── skills/
-│       │   ├── frontend-design/
-│       │   │   └── SKILL.md
-│       │   ├── knowledge-management/
-│       │   │   ├── SKILL.md
-│       │   │   └── references/
-│       │   ├── repo-explorer/
-│       │   │   ├── SKILL.md
-│       │   │   └── references/
-│       │   └── skill-creator/
-│       │       ├── SKILL.md
-│       │       └── references/
+│       │   ├── frontend-design/ → ../../../skills/frontend-design
+│       │   ├── knowledge-management/ → ../../../skills/knowledge-management
+│       │   ├── repo-explorer/    # Plugin-specific skill
+│       │   └── skill-creator/ → ../../../skills/skill-creator
 │       └── scripts/
-│           └── setup-skills.py   # Standalone setup script
+│           └── setup-skills.py
 └── README.md
 ```
+
+**Note:** The plugin uses symlinks to shared primitives at the repo root, enabling reuse across multiple plugins while maintaining a single source of truth.
 
 ---
 
 ## Standalone Skills
 
-The `skills/` directory contains standalone skills that are **not bundled** with the plugin. These are typically specialized or personal-use skills that users can install individually.
+The `skills/` directory contains skills that can be installed independently via `ai-agent-skills`. Some skills are also bundled in the plugin.
 
-### Available Standalone Skills
+### Available Skills
 
-| Skill | Description |
-|-------|-------------|
-| `ctfai-brand` | Brand guidelines for "Coding the Future with AI" - applies consistent branding to PDFs, websites, React themes, etc. |
+| Skill | Description | In Plugin? |
+|-------|-------------|------------|
+| `ctfai-brand` | Brand guidelines for "Coding the Future with AI" | No |
+| `frontend-design` | Production-grade UI creation with distinctive aesthetics | Yes |
+| `knowledge-management` | Intelligent routing to RAG Memory or Confluence | Yes |
+| `skill-creator` | Guide for creating effective Claude Code skills | Yes |
 
-### Installing Standalone Skills
+### Installing Individual Skills
 
-Install standalone skills directly from GitHub using `ai-agent-skills`:
+Install any skill directly from GitHub using `ai-agent-skills`:
 
 ```bash
-npx ai-agent-skills install codingthefuturewithai/claude-code-primitives/ctfai-brand --agent claude
+npx ai-agent-skills install codingthefuturewithai/claude-code-primitives/<skill-name> --agent claude
 ```
 
-After installing, restart Claude Code. The skill will activate automatically based on context or can be invoked with `/ctfai-brand`.
+**Examples:**
+```bash
+npx ai-agent-skills install codingthefuturewithai/claude-code-primitives/ctfai-brand --agent claude
+npx ai-agent-skills install codingthefuturewithai/claude-code-primitives/frontend-design --agent claude
+```
+
+After installing, restart Claude Code. Skills activate automatically based on context or can be invoked with `/<skill-name>`.
 
 ---
 
