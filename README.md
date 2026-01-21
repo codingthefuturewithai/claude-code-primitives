@@ -289,19 +289,13 @@ The `primitives/skills/` directory contains standalone skills that are **not bun
 
 ### Installing Standalone Skills
 
-Claude Code loads skills from `~/.claude/skills/`. To install a standalone skill:
+Install standalone skills directly from GitHub using `ai-agent-skills`:
 
-**Option 1: Symlink (Recommended for Development)**
 ```bash
-ln -s /path/to/claude-code-primitives/primitives/skills/ctfai-brand ~/.claude/skills/ctfai-brand
+npx ai-agent-skills install codingthefuturewithai/claude-code-primitives/primitives/skills/ctfai-brand --agent claude
 ```
 
-**Option 2: Copy**
-```bash
-cp -r /path/to/claude-code-primitives/primitives/skills/ctfai-brand ~/.claude/skills/
-```
-
-After installing, restart Claude Code. The skill will activate automatically based on context or can be invoked with `/<skill-name>`.
+After installing, restart Claude Code. The skill will activate automatically based on context or can be invoked with `/ctfai-brand`.
 
 ---
 
