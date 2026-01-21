@@ -44,9 +44,9 @@ Restart Claude Code to load the skills.
 
 ### Step 5: Verify Installation
 ```
-/knowledge-management --rag test
+/primitives-toolkit:knowledge-management --rag test
 ```
-You should see "📋 SKILL INVOKED: knowledge-management" confirming the skill is active.
+You should see the skill invoked, confirming it's active.
 
 ---
 
@@ -58,17 +58,17 @@ Skills are intelligent workflows that Claude invokes based on context. They prov
 
 | Skill | Trigger | Description |
 |-------|---------|-------------|
-| `knowledge-management` | When you want to save/store content | Routes content to RAG Memory or Confluence with intelligent organization |
-| `frontend-design` | When building UI components | Creates distinctive, production-grade interfaces with bold aesthetics |
-| `skill-creator` | When creating new skills | Guides you through building effective Claude Code skills |
-| `repo-explorer` | When analyzing a GitHub repository | Explores and analyzes codebase structure, architecture, and key files |
+| `primitives-toolkit:knowledge-management` | When you want to save/store content | Routes content to RAG Memory or Confluence with intelligent organization |
+| `primitives-toolkit:frontend-design` | When building UI components | Creates distinctive, production-grade interfaces with bold aesthetics |
+| `primitives-toolkit:skill-creator` | When creating new skills | Guides you through building effective Claude Code skills |
+| `primitives-toolkit:repo-explorer` | When analyzing a GitHub repository | Explores and analyzes codebase structure, architecture, and key files |
 
 **Usage:** Skills activate automatically when Claude detects relevant intent, or invoke directly:
 ```
-/knowledge-management --rag "Store this API documentation"
-/knowledge-management --confluence "Add to team wiki"
-/frontend-design "Create a dashboard for analytics"
-/repo-explorer https://github.com/some/repo
+/primitives-toolkit:knowledge-management --rag "Store this API documentation"
+/primitives-toolkit:knowledge-management --confluence "Add to team wiki"
+/primitives-toolkit:frontend-design "Create a dashboard for analytics"
+/primitives-toolkit:repo-explorer https://github.com/some/repo
 ```
 
 ### Commands (Explicit Actions)
@@ -236,7 +236,6 @@ claude-code-primitives/
 ├── hooks/                        # Shared hooks (source of truth)
 │   └── kb-modification-approval.py
 ├── skills/                       # Shared skills (source of truth)
-│   ├── ctfai-brand/              # Brand guidelines (standalone)
 │   ├── frontend-design/          # UI creation skill
 │   ├── knowledge-management/     # Content routing skill
 │   └── skill-creator/            # Skill development guide
@@ -267,30 +266,18 @@ claude-code-primitives/
 
 ---
 
-## Standalone Skills
+## Standalone Skill Installation
 
-The `skills/` directory contains skills that can be installed independently via `ai-agent-skills`. Some skills are also bundled in the plugin.
-
-### Available Skills
-
-| Skill | Description | In Plugin? |
-|-------|-------------|------------|
-| `ctfai-brand` | Brand guidelines for "Coding the Future with AI" | No |
-| `frontend-design` | Production-grade UI creation with distinctive aesthetics | Yes |
-| `knowledge-management` | Intelligent routing to RAG Memory or Confluence | Yes |
-| `skill-creator` | Guide for creating effective Claude Code skills | Yes |
+Skills in the `skills/` directory can also be installed independently via `ai-agent-skills` without installing the full plugin.
 
 ### Installing Individual Skills
-
-Install any skill directly from GitHub using `ai-agent-skills`:
 
 ```bash
 npx ai-agent-skills install codingthefuturewithai/claude-code-primitives/<skill-name> --agent claude
 ```
 
-**Examples:**
+**Example:**
 ```bash
-npx ai-agent-skills install codingthefuturewithai/claude-code-primitives/ctfai-brand --agent claude
 npx ai-agent-skills install codingthefuturewithai/claude-code-primitives/frontend-design --agent claude
 ```
 
