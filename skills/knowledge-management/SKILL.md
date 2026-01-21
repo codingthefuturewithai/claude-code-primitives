@@ -1,6 +1,6 @@
 ---
 name: primitives-toolkit:knowledge-management
-description: Store or update content in RAG Memory or Confluence. Use when user wants to save, add, store, update, or capture content to RAG Memory, Confluence, external knowledge base, or external documentation.
+description: Intelligent workflow for storing and organizing external knowledge. Use this skill when the user asks to store, remember, capture, or preserve any information externally.
 user-invocable: true
 ---
 
@@ -9,6 +9,17 @@ user-invocable: true
 Route content to the right destination. Execute these steps in exact order.
 
 **Important:** Step labels (R1, R2, C1, B1, etc.) are for YOUR navigation only. NEVER announce step labels to users. Just do the work.
+
+## Optional Flags
+
+| Flag | Description |
+|------|-------------|
+| `--rag` | Route to RAG Memory only |
+| `--confluence` | Route to Confluence only |
+| `--both` | Search both, then decide |
+| `--update` | Force update of related existing document (skip confirmation) |
+| `--aggregate` | Force quick notes aggregation (skip confirmation) - RAG only |
+| `--separate` | Force creation of standalone document (skip confirmation) |
 
 ## Workflow
 
@@ -85,10 +96,74 @@ Only touch RAG Memory MCP server. Do NOT call any Confluence/Atlassian tools.
 
 **R7.** Suggest a topic. Ask user to accept or modify.
 
-**R8.** Ingest content as-is (do not expand or modify):
-   ```
-   ingest_text(content="[user's exact content]", collection_name="[chosen]", topic="[chosen]", ...)
-   ```
+**R7.5** Quick Capture Detection:
+
+   Check if content qualifies as quick capture (ALL must be true):
+   - Length < 500 characters
+   - No markdown headers (lines starting with `#`)
+   - Single paragraph (no `\n\n`)
+
+   **NOT quick capture** → Go to R8 (normal ingestion)
+
+   **IS quick capture** → Check flags:
+   - `--separate` present → Go to R8 (normal ingestion)
+   - `--aggregate` present → Go to QUICK NOTES AGGREGATION below
+   - `--update` present → Go to UPDATE EXISTING DOCUMENT below
+
+   **No flag (most common)** → Use search results from R3:
+
+   **Related document found in R3:**
+   Ask user:
+   "This looks like a quick note. I found a related document: '[title]'
+
+   How would you like to handle this?
+   1. Update '[title]' with this information
+   2. Add to Quick Notes for [collection]
+   3. Create a separate document
+   4. Cancel"
+
+   STOP and wait for response.
+   - User selects 1 → Go to UPDATE EXISTING DOCUMENT
+   - User selects 2 → Go to QUICK NOTES AGGREGATION
+   - User selects 3 → Go to R8
+   - User selects 4 → Say "No problem, cancelled." and END
+
+   **No related document found:**
+   Ask user:
+   "This looks like a quick note. How would you like to store it?
+   1. Add to Quick Notes for [collection]
+   2. Create a separate document
+   3. Cancel"
+
+   STOP and wait for response.
+   - User selects 1 → Go to QUICK NOTES AGGREGATION
+   - User selects 2 → Go to R8
+   - User selects 3 → Say "No problem, cancelled." and END
+
+   ---
+
+   **UPDATE EXISTING DOCUMENT:**
+   1. Get document content via `get_document_by_id(document_id)`
+   2. Append with timestamp: `**Added [YYYY-MM-DD HH:MM]:** [content]`
+   3. Call `update_document(document_id, content=updated_content)`
+   4. Confirm success and END
+
+   ---
+
+   **QUICK NOTES AGGREGATION:**
+   1. Look for existing document titled `Quick Notes - [collection] - YYYY-MM` (current month)
+      Use `list_documents(collection_name)` to find it
+   2. **If exists:**
+      - Get content via `get_document_by_id()`
+      - Append entry: `## YYYY-MM-DD HH:MM\n[content]\n\n---\n`
+      - Call `update_document(document_id, content=updated_content)`
+   3. **If not exists:**
+      - Create via R8 with:
+        - title: `Quick Notes - [collection] - YYYY-MM`
+        - content formatted as: `## YYYY-MM-DD HH:MM\n[content]\n\n---\n`
+   4. Confirm success and END
+
+**R8.** Ingest the content as-is (do not expand or modify). Discover the available RAG Memory ingestion tools and select the appropriate one based on input type (file path, URL, or raw text).
 
 **R9.** If no preference existed in R5, offer to save one:
    "Would you like me to remember that [domain] content goes to [collection]?"
@@ -112,6 +187,54 @@ Atlassian availability was already verified in step 2.
 **C3.** Show search results to user.
 
 **C4.** Select space: present available spaces, let user choose.
+
+**C4.5** Quick Capture Detection:
+
+   Check if content qualifies as quick capture (ALL must be true):
+   - Length < 500 characters
+   - No markdown headers (lines starting with `#`)
+   - Single paragraph (no `\n\n`)
+
+   **NOT quick capture** → Go to C5 (normal page creation)
+
+   **IS quick capture** → Check flags:
+   - `--separate` present → Go to C5 (normal page creation)
+   - `--update` present → Go to UPDATE EXISTING PAGE below
+
+   **No flag (most common)** → Use search results from C2:
+
+   **Related page found in C2:**
+   Ask user:
+   "This looks like a quick note. I found a related page: '[title]'
+
+   How would you like to handle this?
+   1. Update '[title]' with this information
+   2. Create a new page
+   3. Cancel"
+
+   STOP and wait for response.
+   - User selects 1 → Go to UPDATE EXISTING PAGE
+   - User selects 2 → Go to C5
+   - User selects 3 → Say "No problem, cancelled." and END
+
+   **No related page found** → Go to C5 (normal page creation)
+
+   ---
+
+   **UPDATE EXISTING PAGE:**
+   1. Extract `pageId` from search results
+   2. Get current page content via `getConfluencePage(cloudId, pageId)` if needed
+   3. Append with timestamp:
+      ```
+      [existing content]
+
+      ---
+
+      **Added [YYYY-MM-DD HH:MM]:**
+      [new content]
+      ```
+   4. Call `updateConfluencePage(cloudId, pageId, title, updated_content)`
+   5. Confirm success and END
 
 **C5.** Create page:
    ```

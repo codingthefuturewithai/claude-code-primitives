@@ -75,3 +75,48 @@ For URLs with many pages:
 ### File Access
 
 `ingest_file` requires the file to exist on the MCP server's filesystem. For cloud-hosted clients, use `ingest_text` with the file content instead.
+
+## Quick Notes Aggregation
+
+### Document Naming
+
+`Quick Notes - [collection-name] - YYYY-MM`
+
+Example: `Quick Notes - operations-runbooks - 2026-01`
+
+### Entry Format
+
+```markdown
+## YYYY-MM-DD HH:MM
+[content]
+
+---
+```
+
+### Tools for Aggregation
+
+#### list_documents(collection_name)
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| collection_name | string | Yes | Collection to list |
+
+Returns documents with `document_id` and `title`. Use to find existing Quick Notes document.
+
+#### get_document_by_id(document_id)
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| document_id | string | Yes | Document ID from list_documents |
+
+Returns full document content including `content` field. Use before appending.
+
+#### update_document(document_id, content, ...)
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| document_id | string | Yes | Document to update |
+| content | string | No | New content (triggers re-chunking) |
+| metadata | dict | No | Updated metadata |
+
+Updates document content in-place. Same ID is preserved.
