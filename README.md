@@ -104,7 +104,7 @@ Complete development workflow from issue to PR:
 #### Documentation Commands
 | Command | Description |
 |---------|-------------|
-| `/primitives-toolkit:docs:reference-audit` | Audit and sync documentation with codebase |
+| `/primitives-toolkit:docs:documentation-audit` | Audit and sync documentation with codebase |
 
 #### Admin Commands
 | Command | Description |
