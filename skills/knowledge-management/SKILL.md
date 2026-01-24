@@ -1,6 +1,6 @@
 ---
 name: primitives-toolkit:knowledge-management
-description: Intelligent workflow for storing and organizing external knowledge. Use this skill when the user asks to store, remember, capture, or preserve any information externally.
+description: Intelligent workflow for storing and organizing external knowledge. Use this skill when the user asks to store, remember, capture, or preserve any information externally or mentions saving to a knowledge base.
 user-invocable: true
 ---
 
