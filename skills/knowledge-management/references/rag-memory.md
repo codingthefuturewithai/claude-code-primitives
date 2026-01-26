@@ -30,6 +30,24 @@ Returns:
 - `domain_scope` - Description of what content belongs here
 - `description` - Collection purpose
 
+### get_collection_metadata_schema(collection_name)
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| collection_name | string | Yes | Name of collection |
+
+Returns:
+- `name` - Collection name
+- `domain` - High-level domain (e.g., "Operations", "Engineering")
+- `domain_scope` - Description of what content belongs here
+- `description` - Collection purpose
+- `metadata_schema.routing.examples` - Array of example queries/content that SHOULD route to this collection
+- `metadata_schema.routing.exclusions` - Array of example queries/content that should NOT route to this collection
+
+**When to use:** Use this instead of `get_collection_info()` when you need routing hints for collection selection. The routing hints help you understand the *character* of content that belongs in each collection.
+
+**Important:** Routing hints are illustrative examples, not exhaustive rules. Match the type/character of content, not literal text.
+
 ### search_documents(query, collection_name, ...)
 
 | Parameter | Type | Required | Description |

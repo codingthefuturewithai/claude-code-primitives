@@ -1,5 +1,14 @@
 # Agent Preferences Reference
 
+## Routing Hierarchy
+
+When selecting a collection for content, follow this priority order:
+
+1. **Agent-preferences (user decisions)** - Always check first. User preferences override everything.
+2. **Collection routing hints** - Use `routing.examples` and `routing.exclusions` from `get_collection_metadata_schema()` as guidance.
+
+**Important:** Routing hints are illustrative examples, not exhaustive rules. They help you understand the *character* of content that belongs in each collection - match the type, not literal text.
+
 ## How Preferences Work
 
 Preferences are stored in the `agent-preferences` collection. They map domains to destinations.
@@ -19,7 +28,7 @@ Preferences are stored by DOMAIN, not by specific topic.
 | Domain-based | "What are the user's routing preferences for Operations content?" | Yes |
 | Topic-specific | "How has the user routed API authentication notes?" | No |
 
-The domain values come from `get_collection_info()` - fields like "Operations", "Engineering", "Project Management".
+The domain values come from `get_collection_metadata_schema()` - fields like "Operations", "Engineering", "Project Management".
 
 ## When to Save
 
@@ -27,7 +36,10 @@ The domain values come from `get_collection_info()` - fields like "Operations", 
 |-----------|--------|
 | No preference existed | Offer to save |
 | User overrode existing preference | Offer to update |
+| User overrode AI's routing hint suggestion | Offer to save (user chose differently than routing hints suggested) |
 | Preference existed and was followed | Do NOT offer |
+
+**Key insight:** Save preferences when the user makes a routing decision that differs from what the AI suggested based on routing hints. This teaches the system the user's actual preferences.
 
 ## Storage Format
 
