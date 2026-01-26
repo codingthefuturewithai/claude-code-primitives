@@ -83,8 +83,8 @@ Only touch RAG Memory MCP server. Do NOT call any Confluence/Atlassian tools.
 
 **R1.** Call `list_collections()` to get all RAG Memory collections.
 
-**R2.** For EACH collection returned, call `get_collection_info(collection_name)`.
-   Store the `domain` and `domain_scope` values.
+**R2.** For EACH collection returned, call `get_collection_metadata_schema(collection_name)`.
+   Store the `domain`, `domain_scope`, and `routing` values (routing.examples and routing.exclusions).
 
 **R3.** Search for existing content:
    ```
@@ -102,7 +102,23 @@ Only touch RAG Memory MCP server. Do NOT call any Confluence/Atlassian tools.
    ```
    Use domain values like "Operations", "Engineering" from R2.
 
-**R6.** Select collection: match content against `domain_scope`, present top 2-3 collections, let user choose.
+**R6.** Select collection using routing hints:
+
+   1. **Check agent-preferences first** (from R5 results):
+      - If user has an explicit routing preference for this content type, use that collection
+      - User decisions always override collection routing hints
+
+   2. **Score remaining collections** using routing hints from R2:
+      - Use `routing.examples` to understand what TYPE of content fits each collection
+      - Use `routing.exclusions` as negative signals (not hard filters)
+      - These are illustrative examples - match the character of content, not literal text
+
+   3. **Present top 2-3 collections** with reasoning:
+      "Based on the content, I recommend:
+      1. [collection] - similar to: '[matched example type]'
+      2. [collection] - similar to: '[matched example type]'"
+
+   4. Let user confirm or correct.
 
 **R7.** Suggest a topic. Ask user to accept or modify.
 
@@ -262,8 +278,8 @@ Atlassian availability was already verified in step 2.
 
 **B1.** Call `list_collections()` to get all RAG Memory collections.
 
-**B2.** For EACH collection returned, call `get_collection_info(collection_name)`.
-   Store the `domain` and `domain_scope` values.
+**B2.** For EACH collection returned, call `get_collection_metadata_schema(collection_name)`.
+   Store the `domain`, `domain_scope`, and `routing` values (routing.examples and routing.exclusions).
 
 **B3.** Use the cloud ID from step 2. Call `getConfluenceSpaces()` to list available spaces.
 
