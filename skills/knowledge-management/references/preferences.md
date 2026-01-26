@@ -35,7 +35,8 @@ The domain values come from `get_collection_info()` - fields like "Operations", 
 ingest_text(
     content="Routing preference: [Domain] content goes to [collection]. This includes [examples of content types].",
     collection_name="agent-preferences",
-    document_title="Routing: [Domain]"
+    document_title="Routing: [Domain]",
+    actor_type="[Your AI Assistant Name]"  # See Self-Identification in rag-memory.md
 )
 ```
 
@@ -45,7 +46,8 @@ ingest_text(
 ingest_text(
     content="Routing preference: Operations content goes to practices-and-procedures. This includes workflows, SOPs, checklists, and development practices.",
     collection_name="agent-preferences",
-    document_title="Routing: Operations"
+    document_title="Routing: Operations",
+    actor_type="..."  # Your AI assistant product name (validated by backend)
 )
 ```
 

@@ -10,6 +10,16 @@ Route content to the right destination. Execute these steps in exact order.
 
 **Important:** Step labels (R1, R2, C1, B1, etc.) are for YOUR navigation only. NEVER announce step labels to users. Just do the work.
 
+## Self-Identification (REQUIRED)
+
+Before performing ANY ingestion operation, you MUST identify yourself:
+- Reflect on which AI coding assistant you are operating as
+- Pass your product name as the `actor_type` parameter on ALL ingest calls
+- Valid values are maintained in the backend database (not listed here)
+- If you receive an error for an invalid `actor_type`, adjust based on the error message
+
+This enables audit trails to show which AI assistant created or modified content.
+
 ## Optional Flags
 
 | Flag | Description |

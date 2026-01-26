@@ -1,5 +1,17 @@
 # RAG Memory Reference
 
+## Self-Identification
+
+All ingest operations require `actor_type` to identify which AI assistant is performing the action.
+
+**How to determine your actor_type:**
+1. Reflect on which AI coding assistant environment you are operating within
+2. Use your product name, NOT your model name
+3. Valid values are maintained in the backend database (enumerated, not listed here)
+4. If you receive an error for an invalid value, adjust based on the error message
+
+**Why:** This creates an audit trail showing which AI assistant created or modified each document.
+
 ## Tool Parameters
 
 ### list_collections()
@@ -37,6 +49,7 @@ Returns:
 | follow_links | bool | No | Crawl linked pages |
 | max_pages | int | No | Max pages if following links (default 10, max 20) |
 | mode | string | No | "ingest" (default) or "reingest" |
+| actor_type | string | **Yes** | Your AI assistant name (see Self-Identification) |
 
 ### ingest_text(content, collection_name, document_title, topic, ...)
 
@@ -47,6 +60,7 @@ Returns:
 | document_title | string | Yes | Document title |
 | topic | string | No | Topic for relevance |
 | mode | string | No | "ingest" (default) or "reingest" |
+| actor_type | string | **Yes** | Your AI assistant name (see Self-Identification) |
 
 ### ingest_file(file_path, collection_name, topic, ...)
 
@@ -56,6 +70,7 @@ Returns:
 | collection_name | string | Yes | Target collection |
 | topic | string | No | Topic for relevance |
 | mode | string | No | "ingest" (default) or "reingest" |
+| actor_type | string | **Yes** | Your AI assistant name (see Self-Identification) |
 
 ## Edge Cases
 
