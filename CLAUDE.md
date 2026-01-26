@@ -45,21 +45,37 @@ After bumping versions and pushing changes:
    ```bash
    claude
    # Then run:
-   /plugin install primitives-toolkit
+   /plugin install primitives-toolkit@claude-code-primitives
    ```
 
-3. **Verify installation:**
+3. **Setup skills (required for skills to work):**
+   ```
+   /primitives-toolkit:admin:setup-skills
+   ```
+   This creates symlinks in `~/.claude/skills/` for the plugin's skills.
+
+4. **Verify installation:**
    - Run a slash command like `/devflow:workflow-guide`
    - Check that your changes are reflected
 
 ### If you need a clean reinstall:
 
 ```bash
-# Remove the plugin entirely
-rm -rf .claude/plugins/primitives-toolkit
-rm -rf .claude/plugins/claude-code-primitives
+# Remove all plugin traces
+rm -rf ~/.claude/plugins/cache/claude-code-primitives
+rm -rf ~/.claude/plugins/marketplaces/claude-code-primitives
 
-# Then follow steps 1-2 above
+# Remove entries from JSON files (edit these manually):
+# ~/.claude/plugins/installed_plugins.json - remove "primitives-toolkit@claude-code-primitives" entry
+# ~/.claude/plugins/known_marketplaces.json - remove "claude-code-primitives" entry
+```
+
+Then start a new Claude Code session and:
+
+```
+/plugin marketplace add codingthefuturewithai/claude-code-primitives
+/plugin install primitives-toolkit@claude-code-primitives
+/primitives-toolkit:admin:setup-skills
 ```
 
 ## File Organization Rules
