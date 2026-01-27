@@ -14,7 +14,7 @@ You are helping a user set up their RAG Memory collections with a minimal, durab
 - **Don't create automatically** - If collections exist, ask the user what they want to do
 - **Use MCP tools directly** - Create collections via `mcp__rag-memory__create_collection`
 - **Keep it simple** - Propose a small set of durable collections, not many narrow ones
-- **Add routing hints** - After creating each collection, add routing hints via `mcp__rag-memory__update_collection_metadata_schema`
+- **Include routing hints at creation** - Pass routing hints via `metadata_schema` parameter when calling `create_collection`
 - **Do NOT create agent-preferences** - The `agent-preferences` collection is auto-created by the MCP server on startup
 
 ---
@@ -120,16 +120,8 @@ mcp__rag-memory__create_collection(
     name="knowledge-and-reference",
     description="External documentation and reference material (library docs, frameworks, official docs, standards, manuals)",
     domain="Engineering",
-    domain_scope="Official documentation, technical references, standards, and external learning resources. Does not include internal company docs or work-in-progress project notes."
-)
-```
-
-Then add routing hints:
-
-```
-mcp__rag-memory__update_collection_metadata_schema(
-    collection_name="knowledge-and-reference",
-    schema={
+    domain_scope="Official documentation, technical references, standards, and external learning resources. Does not include internal company docs or work-in-progress project notes.",
+    metadata_schema={
         "routing": {
             "examples": [
                 "What does the React docs say about X?",
@@ -154,16 +146,8 @@ mcp__rag-memory__create_collection(
     name="projects",
     description="Work-in-progress contexts (project notes, plans, drafts, links related to things being built or explored)",
     domain="Project",
-    domain_scope="Active and recent project work including design docs, specs, exploration notes, and prototyping context. Does not include stable procedures or completed/archived work."
-)
-```
-
-Then add routing hints:
-
-```
-mcp__rag-memory__update_collection_metadata_schema(
-    collection_name="projects",
-    schema={
+    domain_scope="Active and recent project work including design docs, specs, exploration notes, and prototyping context. Does not include stable procedures or completed/archived work.",
+    metadata_schema={
         "routing": {
             "examples": [
                 "Notes about the redesign project",
@@ -188,16 +172,8 @@ mcp__rag-memory__create_collection(
     name="practices-and-procedures",
     description="Stable ways of working (SOPs, checklists, playbooks, principles, workflows, rules)",
     domain="Operations",
-    domain_scope="Established processes, standard operating procedures, decision frameworks, and repeatable workflows. Does not include one-off project plans or temporary experiments."
-)
-```
-
-Then add routing hints:
-
-```
-mcp__rag-memory__update_collection_metadata_schema(
-    collection_name="practices-and-procedures",
-    schema={
+    domain_scope="Established processes, standard operating procedures, decision frameworks, and repeatable workflows. Does not include one-off project plans or temporary experiments.",
+    metadata_schema={
         "routing": {
             "examples": [
                 "What is our code review process?",
@@ -222,16 +198,8 @@ mcp__rag-memory__create_collection(
     name="people-and-relationships",
     description="Person-centric notes (who someone is, context about people, preferences, history)",
     domain="Personal",
-    domain_scope="Information about individuals including teammates, clients, contacts, and their preferences, history, and context. Does not include general team documentation or processes."
-)
-```
-
-Then add routing hints:
-
-```
-mcp__rag-memory__update_collection_metadata_schema(
-    collection_name="people-and-relationships",
-    schema={
+    domain_scope="Information about individuals including teammates, clients, contacts, and their preferences, history, and context. Does not include general team documentation or processes.",
+    metadata_schema={
         "routing": {
             "examples": [
                 "What do I know about John?",
@@ -256,16 +224,8 @@ mcp__rag-memory__create_collection(
     name="inbox-unsorted",
     description="Temporary holding for uncategorized items; meant to be reviewed and refiled later",
     domain="Intake",
-    domain_scope="Temporary staging area for new content that hasn't been categorized yet. Should be periodically reviewed and moved to appropriate collections."
-)
-```
-
-Then add routing hints:
-
-```
-mcp__rag-memory__update_collection_metadata_schema(
-    collection_name="inbox-unsorted",
-    schema={
+    domain_scope="Temporary staging area for new content that hasn't been categorized yet. Should be periodically reviewed and moved to appropriate collections.",
+    metadata_schema={
         "routing": {
             "examples": [
                 "Save this but not sure where it goes",
@@ -287,16 +247,8 @@ mcp__rag-memory__create_collection(
     name="business-operations",
     description="Accounting/finance exports, vendors, client operations, business strategy, internal business procedures",
     domain="Business",
-    domain_scope="Business management including financial records, vendor relationships, client operations, strategic planning, and internal business processes. Does not include project execution details or external technical documentation."
-)
-```
-
-Then add routing hints:
-
-```
-mcp__rag-memory__update_collection_metadata_schema(
-    collection_name="business-operations",
-    schema={
+    domain_scope="Business management including financial records, vendor relationships, client operations, strategic planning, and internal business processes. Does not include project execution details or external technical documentation.",
+    metadata_schema={
         "routing": {
             "examples": [
                 "Q4 financial records",
@@ -424,6 +376,6 @@ Would you like help troubleshooting?"
 - **Never create collections automatically if they exist** - Always ask first
 - **Use exact names** - Follow kebab-case format: "knowledge-and-reference" (lowercase with hyphens only)
 - **Naming constraint** - Collection names MUST contain only alphanumeric characters, hyphens, and underscores (no spaces, no special chars)
-- **Add routing hints after creation** - Call `update_collection_metadata_schema()` after each `create_collection()` to add routing hints
+- **Include routing hints at creation** - Pass routing hints via `metadata_schema` parameter when calling `create_collection`
 - **Do NOT create agent-preferences** - The `agent-preferences` collection is auto-created by the RAG Memory MCP server on startup with pre-populated routing hints. You will see it when you call `list_collections()`.
 - **Keep it minimal** - 5-6 collections is the goal, not 10+
