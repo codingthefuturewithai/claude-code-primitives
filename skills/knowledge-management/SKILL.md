@@ -6,312 +6,112 @@ user-invocable: true
 
 # Knowledge Management
 
-Route content to the right destination. Execute these steps in exact order.
+Route content to the right destination.
 
-**Important:** Step labels (R1, R2, C1, B1, etc.) are for YOUR navigation only. NEVER announce step labels to users. Just do the work.
+**Say exactly:** "SKILL INVOKED: knowledge-management"
 
 ## Self-Identification (REQUIRED)
 
-Before performing ANY ingestion operation, you MUST identify yourself:
-- Reflect on which AI coding assistant you are operating as
-- Pass your product name as the `actor_type` parameter on ALL ingest calls
-- Valid values are maintained in the backend database (not listed here)
-- If you receive an error for an invalid `actor_type`, adjust based on the error message
+Before ANY ingestion operation, identify yourself:
+- Reflect on which AI coding assistant you are (product name, not model name)
+- Pass this as `actor_type` on ALL ingest calls
+- If you get an invalid actor_type error, adjust based on the error message
 
-This enables audit trails to show which AI assistant created or modified content.
-
-## Optional Flags
+## Flags
 
 | Flag | Description |
 |------|-------------|
 | `--rag` | Route to RAG Memory only |
 | `--confluence` | Route to Confluence only |
 | `--both` | Search both, then decide |
-| `--update` | Force update of related existing document (skip confirmation) |
-| `--aggregate` | Force quick notes aggregation (skip confirmation) - RAG only |
-| `--separate` | Force creation of standalone document (skip confirmation) |
-
-## Workflow
-
-**0.** Say exactly: "📋 SKILL INVOKED: knowledge-management"
-
-**1.** Check arguments for destination flag:
-
-   **`--rag` flag present** → Go to RAG MEMORY PATH below (no Atlassian check needed)
-
-   **`--confluence` flag present** → Go to step 2
-
-   **`--both` flag present** → Go to step 2
-
-   **No flag present** → Go to step 2
-
-**2.** Check if Atlassian MCP server is available by calling `getAccessibleAtlassianResources()`.
-
-   **Atlassian available** → Go to step 3
-
-   **Atlassian NOT available (tool fails or not found)** →
-
-   - If user requested `--confluence`: Say "Confluence is not available. The Atlassian MCP server is not configured. Would you like to store in RAG Memory instead?" Wait for response.
-   - If user requested `--both`: Say "Confluence is not available. The Atlassian MCP server is not configured. Proceeding with RAG Memory only." Go to RAG MEMORY PATH.
-   - If no flag: Say "Note: Confluence is not available (Atlassian MCP server not configured). Storing to RAG Memory." Go to RAG MEMORY PATH.
-
-**3.** Atlassian is available. Now route based on original request:
-
-   **`--confluence` flag was present** → Go to CONFLUENCE PATH below
-
-   **`--both` flag was present** → Go to BOTH PATH below
-
-   **No flag was present** → Ask the user:
-   "Where would you like to store this?
-   1. RAG Memory
-   2. Confluence
-   3. Search both first, then decide
-   4. Cancel - I didn't mean to trigger this"
-
-   STOP and wait for user response before proceeding.
-
-   **User selects 1** → Go to RAG MEMORY PATH below
-   **User selects 2** → Go to CONFLUENCE PATH below
-   **User selects 3** → Go to BOTH PATH below
-   **User selects 4** → Say "No problem, cancelled." and END.
+| `--update` | Force update of related existing document |
+| `--quick` | Force save as quick note (RAG only) |
+| `--separate` | Force creation of full document |
 
 ---
 
-## RAG MEMORY PATH
+## Step 1: Determine Destination
 
-Only touch RAG Memory MCP server. Do NOT call any Confluence/Atlassian tools.
+**`--rag` flag?** → Go to RAG MEMORY (skip Atlassian check)
 
-**R1.** Call `list_collections()` to get all RAG Memory collections.
+**`--confluence` flag?** → Check Atlassian availability (Step 2)
 
-**R2.** For EACH collection returned, call `get_collection_metadata_schema(collection_name)`.
-   Store the `domain`, `domain_scope`, and `routing` values (routing.examples and routing.exclusions).
+**`--both` flag?** → Check Atlassian availability (Step 2)
 
-**R3.** Search for existing content:
-   ```
-   search_documents(query="What content exists about [topic]?", limit=5)
-   ```
-
-**R4.** Show search results to user.
-
-**R5.** Query agent-preferences for collection guidance:
-   ```
-   search_documents(
-       query="What are the user's routing preferences for [domain] content?",
-       collection_name="agent-preferences"
-   )
-   ```
-   Use domain values like "Operations", "Engineering" from R2.
-
-**R6.** Select collection using routing hints:
-
-   1. **Check agent-preferences first** (from R5 results):
-      - If user has an explicit routing preference for this content type, use that collection
-      - User decisions always override collection routing hints
-
-   2. **Score remaining collections** using routing hints from R2:
-      - Use `routing.examples` to understand what TYPE of content fits each collection
-      - Use `routing.exclusions` as negative signals (not hard filters)
-      - These are illustrative examples - match the character of content, not literal text
-
-   3. **Present top 2-3 collections** with reasoning:
-      "Based on the content, I recommend:
-      1. [collection] - similar to: '[matched example type]'
-      2. [collection] - similar to: '[matched example type]'"
-
-   4. Let user confirm or correct.
-
-**R7.** Suggest a topic. Ask user to accept or modify.
-
-**R7.5** Quick Capture Detection:
-
-   Check if content qualifies as quick capture (ALL must be true):
-   - Length < 500 characters
-   - No markdown headers (lines starting with `#`)
-   - Single paragraph (no `\n\n`)
-
-   **NOT quick capture** → Go to R8 (normal ingestion)
-
-   **IS quick capture** → Check flags:
-   - `--separate` present → Go to R8 (normal ingestion)
-   - `--aggregate` present → Go to QUICK NOTES AGGREGATION below
-   - `--update` present → Go to UPDATE EXISTING DOCUMENT below
-
-   **No flag (most common)** → Use search results from R3:
-
-   **Related document found in R3:**
-   Ask user:
-   "This looks like a quick note. I found a related document: '[title]'
-
-   How would you like to handle this?
-   1. Update '[title]' with this information
-   2. Add to Quick Notes for [collection]
-   3. Create a separate document
-   4. Cancel"
-
-   STOP and wait for response.
-   - User selects 1 → Go to UPDATE EXISTING DOCUMENT
-   - User selects 2 → Go to QUICK NOTES AGGREGATION
-   - User selects 3 → Go to R8
-   - User selects 4 → Say "No problem, cancelled." and END
-
-   **No related document found:**
-   Ask user:
-   "This looks like a quick note. How would you like to store it?
-   1. Add to Quick Notes for [collection]
-   2. Create a separate document
-   3. Cancel"
-
-   STOP and wait for response.
-   - User selects 1 → Go to QUICK NOTES AGGREGATION
-   - User selects 2 → Go to R8
-   - User selects 3 → Say "No problem, cancelled." and END
-
-   ---
-
-   **UPDATE EXISTING DOCUMENT:**
-   1. Get document content via `get_document_by_id(document_id)`
-   2. Append with timestamp: `**Added [YYYY-MM-DD HH:MM]:** [content]`
-   3. Call `update_document(document_id, content=updated_content)`
-   4. Confirm success and END
-
-   ---
-
-   **QUICK NOTES AGGREGATION:**
-   1. Look for existing document titled `Quick Notes - [collection] - YYYY-MM` (current month)
-      Use `list_documents(collection_name)` to find it
-   2. **If exists:**
-      - Get content via `get_document_by_id()`
-      - Append entry: `## YYYY-MM-DD HH:MM\n[content]\n\n---\n`
-      - Call `update_document(document_id, content=updated_content)`
-   3. **If not exists:**
-      - Create via R8 with:
-        - title: `Quick Notes - [collection] - YYYY-MM`
-        - content formatted as: `## YYYY-MM-DD HH:MM\n[content]\n\n---\n`
-   4. Confirm success and END
-
-**R8.** Ingest the content as-is (do not expand or modify). Discover the available RAG Memory ingestion tools and select the appropriate one based on input type (file path, URL, or raw text).
-
-**R9.** If no preference existed in R5, offer to save one:
-   "Would you like me to remember that [domain] content goes to [collection]?"
-
-END.
+**No flag?** → Check Atlassian availability (Step 2)
 
 ---
 
-## CONFLUENCE PATH
+## Step 2: Check Atlassian Availability
 
-Only touch Confluence/Atlassian MCP server. Do NOT call any RAG Memory tools.
-Atlassian availability was already verified in step 2.
+Call `getAccessibleAtlassianResources()`.
 
-**C1.** Use the cloud ID from step 2. Call `getConfluenceSpaces()` to list available spaces.
+**Available?** → Go to Step 3
 
-**C2.** Search for existing content:
-   ```
-   search(query="What documentation exists about [topic]?")
-   ```
-
-**C3.** Show search results to user.
-
-**C4.** Select space: present available spaces, let user choose.
-
-**C4.5** Quick Capture Detection:
-
-   Check if content qualifies as quick capture (ALL must be true):
-   - Length < 500 characters
-   - No markdown headers (lines starting with `#`)
-   - Single paragraph (no `\n\n`)
-
-   **NOT quick capture** → Go to C5 (normal page creation)
-
-   **IS quick capture** → Check flags:
-   - `--separate` present → Go to C5 (normal page creation)
-   - `--update` present → Go to UPDATE EXISTING PAGE below
-
-   **No flag (most common)** → Use search results from C2:
-
-   **Related page found in C2:**
-   Ask user:
-   "This looks like a quick note. I found a related page: '[title]'
-
-   How would you like to handle this?
-   1. Update '[title]' with this information
-   2. Create a new page
-   3. Cancel"
-
-   STOP and wait for response.
-   - User selects 1 → Go to UPDATE EXISTING PAGE
-   - User selects 2 → Go to C5
-   - User selects 3 → Say "No problem, cancelled." and END
-
-   **No related page found** → Go to C5 (normal page creation)
-
-   ---
-
-   **UPDATE EXISTING PAGE:**
-   1. Extract `pageId` from search results
-   2. Get current page content via `getConfluencePage(cloudId, pageId)` if needed
-   3. Append with timestamp:
-      ```
-      [existing content]
-
-      ---
-
-      **Added [YYYY-MM-DD HH:MM]:**
-      [new content]
-      ```
-   4. Call `updateConfluencePage(cloudId, pageId, title, updated_content)`
-   5. Confirm success and END
-
-**C5.** Create page:
-   ```
-   createConfluencePage(cloudId="...", spaceId="...", title="...", content="[user's exact content]")
-   ```
-
-END.
+**Not available?**
+- If `--confluence` was requested: "Confluence unavailable (Atlassian MCP not configured). Store in RAG Memory instead?" Wait for response.
+- If `--both` was requested: "Confluence unavailable. Proceeding with RAG Memory only." → Go to RAG MEMORY
+- If no flag: "Note: Confluence unavailable. Storing to RAG Memory." → Go to RAG MEMORY
 
 ---
 
-## BOTH PATH
+## Step 3: Route by Flag
 
-Touch both MCP servers. Search both, then ask user where to store.
-Atlassian availability was already verified in step 2.
+**`--confluence`?** → Go to CONFLUENCE
 
-**B1.** Call `list_collections()` to get all RAG Memory collections.
+**`--both`?** → Go to BOTH
 
-**B2.** For EACH collection returned, call `get_collection_metadata_schema(collection_name)`.
-   Store the `domain`, `domain_scope`, and `routing` values (routing.examples and routing.exclusions).
+**No flag?** → Ask user:
+> Where would you like to store this?
+> 1. RAG Memory
+> 2. Confluence
+> 3. Search both first, then decide
+> 4. Cancel
 
-**B3.** Use the cloud ID from step 2. Call `getConfluenceSpaces()` to list available spaces.
-
-**B4.** Search BOTH systems:
-   ```
-   search_documents(query="What content exists about [topic]?", limit=5)
-   search(query="What documentation exists about [topic]?")
-   ```
-
-**B5.** Show results from both systems to user.
-
-**B6.** Query agent-preferences for routing guidance:
-   ```
-   search_documents(
-       query="What are the user's routing preferences for [domain] content?",
-       collection_name="agent-preferences"
-   )
-   ```
-
-**B7.** Ask user: "Based on these results, where should I store this - RAG Memory or Confluence?"
-
-**B8.** Based on user answer:
-   - RAG Memory → Go to R6 (skip R1-R5, already done)
-   - Confluence → Go to C4 (skip C1-C3, already done)
-
-END.
+STOP and wait. Then route based on answer.
 
 ---
 
-## Reference Documents
+## RAG MEMORY
 
-For detailed tool parameters and edge cases:
-- [rag-memory.md](references/rag-memory.md) - RAG Memory tool details
-- [confluence.md](references/confluence.md) - Confluence tool details
-- [preferences.md](references/preferences.md) - Preference storage format
+Follow the workflow in [references/rag-memory.md](references/rag-memory.md).
+
+Summary:
+1. Discover collections and their routing hints
+2. Search for existing related content
+3. Check agent-preferences for user's routing preferences
+4. Classify content type (quick note vs full document)
+5. Route accordingly:
+   - **Quick note** → `quick-notes` collection (individual documents, user merges later)
+   - **Update existing** → Append to related document
+   - **Full document** → Select collection, ingest
+
+---
+
+## CONFLUENCE
+
+Follow the workflow in [references/confluence.md](references/confluence.md).
+
+Summary:
+1. Get available spaces
+2. Search for existing related content
+3. Classify content (short update vs full page)
+4. Route accordingly:
+   - **Update existing** → Append to related page
+   - **New page** → Select space, create page
+
+---
+
+## BOTH
+
+Search both systems, then let user decide.
+
+1. Discover RAG collections (see rag-memory.md)
+2. Get Confluence spaces (see confluence.md)
+3. Search both:
+   - `search_documents(query="[topic]", limit=5)`
+   - `search(query="[topic]")`
+4. Show results from both
+5. Ask: "Based on these results, where should I store this - RAG Memory or Confluence?"
+6. Route to chosen destination's workflow
+
