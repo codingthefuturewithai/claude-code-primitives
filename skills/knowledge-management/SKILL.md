@@ -17,6 +17,20 @@ Before ANY ingestion operation, identify yourself:
 - Pass this as `actor_type` on ALL ingest calls
 - If you get an invalid actor_type error, adjust based on the error message
 
+## Critical Rules
+
+STOP IMMEDIATELY and inform the user when:
+- URL access fails (403, 401, 404, blocked, forbidden)
+- File access fails (not found, unsupported type, too large)
+- Any error where proceeding would definitely fail
+
+DO NOT:
+- Ask for inputs when the operation will fail anyway
+- Claim you did something you didn't
+- Offer actions you cannot perform
+
+**Principle:** If a step fails, ask: will the same failure affect the next step? If yes, STOP.
+
 ## Flags
 
 | Flag | Description |
@@ -77,14 +91,13 @@ STOP and wait. Then route based on answer.
 Follow the workflow in [references/rag-memory.md](references/rag-memory.md).
 
 Summary:
-1. Discover collections and their routing hints
-2. Search for existing related content
-3. Check agent-preferences for user's routing preferences
-4. Classify content type (quick note vs full document)
-5. Route accordingly:
-   - **Quick note** → `quick-notes` collection (individual documents, user merges later)
-   - **Update existing** → Append to related document
-   - **Full document** → Select collection, ingest
+1. **User topic check** - If provided, use it exactly
+2. **Quick note check** - Short, informal → route to `quick-notes`
+3. **URL preview** - If URL without topic, preview first; STOP if blocked
+4. **Agent-preferences FIRST** - Check for routing rules before collection discovery
+5. **Collection discovery** - Only if no preference found
+6. **Confirm with user** - Present recommendation, wait for approval
+7. **Ingest** - Use appropriate tool with collection, topic, actor_type
 
 ---
 

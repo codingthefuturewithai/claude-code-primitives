@@ -21,12 +21,20 @@ This includes workflows, SOPs, checklists, and development practices.
 
 ## Query Format
 
-Preferences are stored by DOMAIN, not by specific topic.
+Query agent-preferences using content type or domain:
+
+```
+search_documents(
+    collection_name="agent-preferences",
+    query="routing rules for [content type/domain]"
+)
+```
 
 | Query Type | Example | Works? |
 |------------|---------|--------|
-| Domain-based | "What are the user's routing preferences for Operations content?" | Yes |
-| Topic-specific | "How has the user routed API authentication notes?" | No |
+| Content type | "routing rules for API documentation" | Yes |
+| Domain-based | "routing rules for Operations content" | Yes |
+| Too specific | "How has the user routed API authentication notes?" | No |
 
 The domain values come from `get_collection_metadata_schema()` - fields like "Operations", "Engineering", "Project Management".
 
