@@ -122,6 +122,7 @@ mcp__rag-memory__create_collection(
     domain="Engineering",
     domain_scope="Official documentation, technical references, standards, and external learning resources. Does not include internal company docs or work-in-progress project notes.",
     metadata_schema={
+        "custom": {},
         "routing": {
             "examples": [
                 "What does the React docs say about X?",
@@ -148,6 +149,7 @@ mcp__rag-memory__create_collection(
     domain="Project",
     domain_scope="Active and recent project work including design docs, specs, exploration notes, and prototyping context. Does not include stable procedures or completed/archived work.",
     metadata_schema={
+        "custom": {},
         "routing": {
             "examples": [
                 "Notes about the redesign project",
@@ -174,6 +176,7 @@ mcp__rag-memory__create_collection(
     domain="Operations",
     domain_scope="Established processes, standard operating procedures, decision frameworks, and repeatable workflows. Does not include one-off project plans or temporary experiments.",
     metadata_schema={
+        "custom": {},
         "routing": {
             "examples": [
                 "What is our code review process?",
@@ -200,6 +203,7 @@ mcp__rag-memory__create_collection(
     domain="Personal",
     domain_scope="Information about individuals including teammates, clients, contacts, and their preferences, history, and context. Does not include general team documentation or processes.",
     metadata_schema={
+        "custom": {},
         "routing": {
             "examples": [
                 "What do I know about John?",
@@ -226,6 +230,7 @@ mcp__rag-memory__create_collection(
     domain="Intake",
     domain_scope="Temporary staging area for new content that hasn't been categorized yet. Should be periodically reviewed and moved to appropriate collections.",
     metadata_schema={
+        "custom": {},
         "routing": {
             "examples": [
                 "Save this but not sure where it goes",
@@ -249,6 +254,7 @@ mcp__rag-memory__create_collection(
     domain="Business",
     domain_scope="Business management including financial records, vendor relationships, client operations, strategic planning, and internal business processes. Does not include project execution details or external technical documentation.",
     metadata_schema={
+        "custom": {},
         "routing": {
             "examples": [
                 "Q4 financial records",
