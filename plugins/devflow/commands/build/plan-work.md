@@ -1,6 +1,6 @@
 ---
 description: Analyze issue and develop implementation plan
-argument-hint: "[--tdd] [ISSUE-KEY or GitLab issue number]"
+argument-hint: "[--tdd] [ISSUE-KEY, GitLab issue number, or GitHub issue number]"
 allowed-tools: [
   "Grep", "Glob", "Read", "Bash", "Write",
   "mcp__atlassian__getJiraIssue", "mcp__atlassian__getAccessibleAtlassianResources",
@@ -31,9 +31,10 @@ I'll analyze issue $ARGUMENTS and create a detailed implementation plan.
    ```
 
 2. **If config exists:** Read and parse:
-   - Extract `issues.backend` (jira, gitlab, none)
+   - Extract `issues.backend` (jira, gitlab, github, none)
    - For Jira: Extract `cloudId` if saved
    - For GitLab: Extract `default_project` if saved
+   - For GitHub: Uses current repo context
 
 3. **If no config exists:**
    - Default to Jira (backwards compatible)
@@ -57,6 +58,12 @@ Let me fetch the full issue details.
 **If ISSUES_BACKEND = "gitlab":**
 1. Use `mcp__gitlab__get_issue` with project_id and iid
 2. Extract: Title, Description, Labels
+
+**If ISSUES_BACKEND = "github":**
+1. Verify gh CLI is available: `which gh && gh auth status`
+2. If not available, STOP and inform user to install/authenticate gh CLI
+3. Use `gh issue view $ARGUMENTS --json number,title,body,state,labels`
+4. Extract: Title (title), Description (body), Labels (labels)
 
 **If ISSUES_BACKEND = "none":**
 1. Skip issue fetch

@@ -2,7 +2,7 @@
 description: Create issue with codebase analysis
 argument-hint: "[brief-description]"
 allowed-tools: [
-  "Read", "Grep", "Glob",
+  "Read", "Grep", "Glob", "Bash",
   "mcp__atlassian__getAccessibleAtlassianResources", "mcp__atlassian__getVisibleJiraProjects",
   "mcp__atlassian__getJiraProjectIssueTypesMetadata", "mcp__atlassian__createJiraIssue",
   "mcp__gitlab__list_projects", "mcp__gitlab__create_issue",
@@ -36,9 +36,10 @@ Request: $ARGUMENTS
    ```
 
 2. **If config exists:** Read and parse:
-   - Extract `issues.backend` (jira, gitlab, none)
+   - Extract `issues.backend` (jira, gitlab, github, none)
    - For Jira: Extract `cloudId` if saved
    - For GitLab: Extract `default_project` if saved
+   - For GitHub: Uses current repo context
 
 3. **If no config exists:**
    - Default to Jira (backwards compatible)
@@ -90,6 +91,28 @@ Ask ONLY: "Which project?" [Display: path_with_namespace - name]
 
 ---
 
+[If ISSUES_BACKEND = "github"]:
+
+**Verify gh CLI:**
+
+```bash
+which gh && gh auth status
+```
+
+If gh is not installed or not authenticated, STOP and inform user:
+> "GitHub CLI (gh) is required but not available.
+> - Install: `brew install gh` (macOS) or see https://github.com/cli/cli
+> - Authenticate: `gh auth login`"
+
+**Get current repo:**
+```bash
+gh repo view --json nameWithOwner -q '.nameWithOwner'
+```
+
+Say: "Using GitHub repository: [owner/repo]"
+
+---
+
 [If ISSUES_BACKEND = "none"]:
 
 **Local Issue:**
@@ -117,6 +140,7 @@ Options:
 [Map to issue types]:
 - **Jira:** Feature → "Executable Spec", Bug → "Bug", Others → "Task"
 - **GitLab:** All create as issues with appropriate labels
+- **GitHub:** All create as issues with appropriate labels
 
 [For Jira: Call `mcp__atlassian__getJiraProjectIssueTypesMetadata` to verify type exists]
 
@@ -301,6 +325,15 @@ Return: Issue key, URL, suggested branch name.
   - labels (comma-separated)
 ]
 Return: Issue IID, web_url, suggested branch name.
+
+[If ISSUES_BACKEND = "github"]:
+```bash
+gh issue create \
+  --title "[title]" \
+  --body "[description]" \
+  --label "[labels comma-separated]"
+```
+Return: Issue number, URL, suggested branch name.
 
 [If ISSUES_BACKEND = "none"]:
 Display: "Issue drafted. Copy the description above for your local tracking."

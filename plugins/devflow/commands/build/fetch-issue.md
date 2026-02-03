@@ -1,6 +1,6 @@
 ---
 description: Fetch issue and analyze feasibility
-argument-hint: "[ISSUE-KEY or GitLab issue number]"
+argument-hint: "[ISSUE-KEY, GitLab issue number, or GitHub issue number]"
 allowed-tools: [
   "Grep", "Glob", "Read", "Bash",
   "mcp__atlassian__getJiraIssue", "mcp__atlassian__getAccessibleAtlassianResources",
@@ -32,10 +32,11 @@ Issue: $ARGUMENTS
    ```
 
 2. **If config exists:** Read and parse:
-   - Extract `issues.backend` (jira, gitlab, or none)
+   - Extract `issues.backend` (jira, gitlab, github, or none)
    - Extract `issues.enabled` (true/false)
    - For Jira: Extract `cloudId` if saved
    - For GitLab: Extract `default_project` if saved
+   - For GitHub: Uses current repo context
 
 3. **If no config exists:**
    - Default to Atlassian/Jira (backwards compatible)
@@ -46,6 +47,7 @@ Issue: $ARGUMENTS
 **Backend determines adapter to use:**
 - `jira` → Follow patterns in `adapters/issues/jira.md`
 - `gitlab` → Follow patterns in `adapters/issues/gitlab.md`
+- `github` → Follow patterns in `adapters/issues/github.md`
 - `none` → Skip issue fetch, proceed with local analysis only
 
 ---
@@ -70,6 +72,29 @@ Issue: $ARGUMENTS
 **Note:** GitLab uses `iid` (project-specific issue number).
 If $ARGUMENTS is just a number (e.g., "123"), use it as iid.
 If $ARGUMENTS includes project (e.g., "my-project/123"), parse accordingly.
+
+---
+
+[If ISSUES_BACKEND = "github"]:
+
+**Using GitHub Issues via gh CLI**
+
+**First, verify gh CLI is available:**
+```bash
+which gh && gh auth status
+```
+
+If gh is not installed or not authenticated, STOP and inform user:
+> "GitHub CLI (gh) is required but not available.
+> - Install: `brew install gh` (macOS) or see https://github.com/cli/cli
+> - Authenticate: `gh auth login`"
+
+**Fetch issue:**
+```bash
+gh issue view $ARGUMENTS --json number,title,body,state,labels,assignees,url
+```
+
+**Note:** $ARGUMENTS should be the issue number (e.g., "123").
 
 ---
 

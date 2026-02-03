@@ -1,6 +1,6 @@
 ---
 description: Final validation, create PR/MR, and mark issue done
-argument-hint: "[ISSUE-KEY or GitLab issue number]"
+argument-hint: "[ISSUE-KEY, GitLab issue number, or GitHub issue number]"
 allowed-tools: [
   "Bash", "Read", "Grep", "Glob",
   "mcp__atlassian__getJiraIssue", "mcp__atlassian__getAccessibleAtlassianResources",
@@ -33,10 +33,11 @@ Issue: $ARGUMENTS
    ```
 
 2. **If config exists:** Read and parse:
-   - Extract `issues.backend` (jira, gitlab, none)
+   - Extract `issues.backend` (jira, gitlab, github, none)
    - Extract `vcs.backend` (github, gitlab)
    - For Jira: Extract `cloudId` if saved
    - For GitLab: Extract `default_project` if saved
+   - For GitHub Issues: Uses current repo context
 
 3. **If no config exists:**
    - Default to Jira + GitHub (backwards compatible)
@@ -47,7 +48,7 @@ Issue: $ARGUMENTS
    - VCS_BACKEND for PR/MR creation
 
 **Backend determines adapters:**
-- Issues: `adapters/issues/jira.md` or `adapters/issues/gitlab.md`
+- Issues: `adapters/issues/jira.md`, `adapters/issues/gitlab.md`, or `adapters/issues/github.md`
 - VCS: `adapters/vcs/github.md` or `adapters/vcs/gitlab.md`
 
 ---
@@ -131,6 +132,24 @@ Issue: [ISSUE-KEY] - [Summary]
 [Call `mcp__gitlab__get_issue` with project_id and issue_iid]
 
 Issue: #[IID] - [Title]
+
+---
+
+[If ISSUES_BACKEND = "github"]:
+
+**Verify gh CLI:**
+```bash
+which gh && gh auth status
+```
+
+If gh is not installed or not authenticated, STOP and inform user.
+
+**Fetch issue:**
+```bash
+gh issue view $ARGUMENTS --json number,title,body,state,url
+```
+
+Issue: #[number] - [title]
 
 ---
 
@@ -249,6 +268,19 @@ Closes #[IID]
 ✅ GitLab Issue: #[IID] → Closed
 
 **Note:** GitLab will also auto-close the issue when the MR is merged (due to "Closes #IID" in description).
+
+---
+
+[If ISSUES_BACKEND = "github"]:
+
+**Note:** If VCS is also GitHub, the issue will auto-close when PR is merged (due to "Fixes #[number]" in PR body).
+
+If you want to close the issue immediately:
+```bash
+gh issue close $ARGUMENTS --comment "Completed in PR #[PR_NUMBER]"
+```
+
+✅ GitHub Issue: #[number] → Closed
 
 ---
 

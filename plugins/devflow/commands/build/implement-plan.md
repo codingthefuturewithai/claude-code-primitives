@@ -1,6 +1,6 @@
 ---
 description: Execute approved implementation plan
-argument-hint: "[--auto] [ISSUE-KEY or GitLab issue number]"
+argument-hint: "[--auto] [ISSUE-KEY, GitLab issue number, or GitHub issue number]"
 allowed-tools: [
   "Read", "Write", "Edit", "Bash", "Grep", "Glob", "TodoWrite",
   "mcp__atlassian__getAccessibleAtlassianResources", "mcp__atlassian__getJiraIssue",
@@ -36,9 +36,10 @@ I'll execute the approved implementation plan for $ARGUMENTS.
    ```
 
 2. **If config exists:** Read and parse:
-   - Extract `issues.backend` (jira, gitlab, none)
+   - Extract `issues.backend` (jira, gitlab, github, none)
    - For Jira: Extract `cloudId` if saved
    - For GitLab: Extract `default_project` if saved
+   - For GitHub: Uses current repo context
 
 3. **If no config exists:**
    - Default to Jira (backwards compatible)
@@ -182,6 +183,16 @@ git checkout -b [branch-name]
    - issue_iid: $ARGUMENTS
    - labels: add "In Progress" to existing labels
 2. Display: "✅ GitLab Issue: In Progress"
+
+**If ISSUES_BACKEND = "github":**
+
+1. Verify gh CLI is available: `which gh && gh auth status`
+2. If not available, STOP and inform user to install/authenticate gh CLI
+3. Add "in-progress" label to issue:
+   ```bash
+   gh issue edit $ARGUMENTS --add-label "in-progress"
+   ```
+4. Display: "✅ GitHub Issue: In Progress"
 
 **If ISSUES_BACKEND = "none":**
 

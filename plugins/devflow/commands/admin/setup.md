@@ -49,7 +49,8 @@ If config exists, show current settings and ask:
 > "Do you want to use an issue tracker with DevFlow?"
 > 1. Yes - Jira (Atlassian MCP)
 > 2. Yes - GitLab Issues (GitLab MCP)
-> 3. No - Skip issue tracking (code-only workflows)
+> 3. Yes - GitHub Issues (gh CLI)
+> 4. No - Skip issue tracking (code-only workflows)
 
 ### If Jira selected:
 
@@ -82,6 +83,36 @@ Call mcp__gitlab__list_projects
   > 3. Skip issue tracking
 
 If help requested, read and display: `adapters/setup/gitlab-mcp.md`
+
+### If GitHub Issues selected:
+
+**Test gh CLI:**
+```bash
+# Check if gh is installed
+which gh
+
+# Check if authenticated
+gh auth status
+```
+
+- **Success (both checks pass):** Continue
+- **gh not installed:**
+  > "GitHub CLI (gh) not installed. Would you like:"
+  > 1. Help installing it (show instructions)
+  > 2. Try a different option
+  > 3. Skip issue tracking
+
+  If help requested, show:
+  > "Install the GitHub CLI:
+  > - macOS: `brew install gh`
+  > - Linux: See https://github.com/cli/cli#installation
+  > - Windows: `winget install GitHub.cli`
+  >
+  > Then authenticate: `gh auth login`"
+
+- **gh not authenticated:**
+  > "GitHub CLI not authenticated. Please run: `gh auth login`
+  > Then re-run this setup."
 
 ---
 
@@ -228,12 +259,14 @@ Write to chosen location:
 # Regenerate anytime with: /devflow:admin:setup
 
 ## Issue Tracking
-backend: [jira/gitlab/none]
+backend: [jira/gitlab/github/none]
 enabled: [true/false]
 # For Jira:
 cloudId: [if jira]
 # For GitLab:
 default_project: [if gitlab, optional]
+# For GitHub:
+# Uses current repo context via gh CLI
 
 ## Documentation
 backend: [confluence/google-docs/none]
