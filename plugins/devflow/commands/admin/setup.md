@@ -195,19 +195,38 @@ If help requested, read and display: `adapters/setup/rag-memory-mcp.md`
 
 ---
 
-## Step 5: VCS Auto-Detection
+## Step 5: VCS Configuration
 
-**Detect from git remote:**
+**VCS is determined by your issue tracker choice:**
+
+### If GitLab Issues selected in Step 2:
+VCS = **GitLab** (use GitLab MCP for Merge Requests)
+
+> "VCS: GitLab MRs (matched to your GitLab Issues selection)"
+
+### If GitHub Issues selected in Step 2:
+VCS = **GitHub** (use gh CLI for Pull Requests)
+
+> "VCS: GitHub PRs (matched to your GitHub Issues selection)"
+
+### If Jira selected OR no issue tracker:
+**Auto-detect from git remote:**
 ```bash
 git remote get-url origin 2>/dev/null
 ```
 
-- Contains `github.com` → GitHub (use gh CLI)
+- Contains `github.com` → GitHub (use gh CLI for PRs)
 - Contains `gitlab` → GitLab (use GitLab MCP for MRs)
-- Other → Default to git-only
+- Other → Default to GitHub (most common)
 
-**Show detection:**
 > "Detected VCS: [GitHub/GitLab] from git remote"
+
+**Note:** If using Jira with a GitLab repo, the git remote detection will correctly identify GitLab for MRs.
+
+---
+
+**Show VCS selection:**
+> "VCS Backend: [GitHub PRs / GitLab MRs]"
 >
 > This will be used for PR/MR creation in `/devflow:build:complete-issue`
 
