@@ -9,7 +9,7 @@
     {
       "name": "devflow",
       "description": "Complete DevFlow toolkit: multi-backend issue tracking, documentation, PR/MR creation",
-      "version": "2.1.0",
+      "version": "2.1.1",
       "source": "./plugins/devflow"
     }
   ]
