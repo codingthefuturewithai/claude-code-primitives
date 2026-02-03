@@ -1,1 +1,0 @@
-../../../hooks/kb-modification-approval.py

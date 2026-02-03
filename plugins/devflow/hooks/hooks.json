@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__rag-memory__create_collection|mcp__rag-memory__delete_collection|mcp__rag-memory__update_collection_metadata|mcp__rag-memory__update_document|mcp__rag-memory__delete_document|mcp__rag-memory__manage_collection_link|mcp__rag-memory__ingest_text|mcp__rag-memory__ingest_url|mcp__rag-memory__ingest_file|mcp__rag-memory__ingest_directory|mcp__atlassian__createConfluencePage|mcp__atlassian__updateConfluencePage|mcp__atlassian__createConfluenceFooterComment|mcp__atlassian__createConfluenceInlineComment|mcp__atlassian__createJiraIssue|mcp__atlassian__editJiraIssue|mcp__atlassian__addCommentToJiraIssue|mcp__atlassian__transitionJiraIssue|mcp__atlassian__addWorklogToJiraIssue|mcp__gitlab__create_issue|mcp__gitlab__update_issue|mcp__gitlab__delete_issue|mcp__gitlab__create_merge_request|mcp__gitlab__update_merge_request|mcp__gitlab__create_note|mcp__google-workspace__create_doc|mcp__google-workspace__modify_doc_text|mcp__google-workspace__create_drive_file|mcp__google-workspace__update_drive_file|mcp__google-workspace__share_drive_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/kb-modification-approval.py"
+          }
+        ]
+      }
+    ]
+  }
+}

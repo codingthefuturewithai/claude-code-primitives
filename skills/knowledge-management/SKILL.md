@@ -1,5 +1,5 @@
 ---
-name: primitives-toolkit:knowledge-management
+name: devflow:knowledge-management
 description: Intelligent workflow for storing and organizing external knowledge. Use this skill when the user asks to store, remember, capture, or preserve any information externally or mentions saving to a knowledge base.
 user-invocable: true
 ---
@@ -31,12 +31,45 @@ DO NOT:
 
 **Principle:** If a step fails, ask: will the same failure affect the next step? If yes, STOP.
 
+---
+
+## Step 0: Check Available Backends
+
+Load DevFlow configuration to determine what's available.
+
+**Check for config file:**
+1. Check `.claude/devflow-config.md` (project)
+2. Check `~/.claude/devflow-config.md` (global)
+3. If no config → Default to checking both RAG Memory and Atlassian
+
+**Parse configuration:**
+- `rag-memory.enabled` - Is RAG Memory available?
+- `docs.enabled` - Is a docs backend enabled?
+- `docs.backend` - Which one? (confluence, google-docs)
+- `rag-memory.routing` - How to route content (decide-each-time, quick-to-rag, all-to-rag)
+
+**Availability check:**
+
+| RAG Memory | Docs Backend | Skill Status |
+|------------|--------------|--------------|
+| Enabled | Enabled | Full routing available |
+| Enabled | Disabled | RAG Memory only |
+| Disabled | Enabled | Docs backend only |
+| Disabled | Disabled | Inform user to run `/devflow:admin:setup` and STOP |
+
+Store:
+- RAG_ENABLED: true/false
+- DOCS_ENABLED: true/false
+- DOCS_BACKEND: confluence/google-docs/none
+
 ## Flags
 
 | Flag | Description |
 |------|-------------|
 | `--rag` | Route to RAG Memory only |
-| `--confluence` | Route to Confluence only |
+| `--docs` | Route to configured docs backend (Confluence or Google Docs) |
+| `--confluence` | Route to Confluence specifically (if available) |
+| `--google` | Route to Google Docs specifically (if available) |
 | `--both` | Search both, then decide |
 | `--update` | Force update of related existing document |
 | `--quick` | Force save as quick note (RAG only) |
@@ -46,39 +79,67 @@ DO NOT:
 
 ## Step 1: Determine Destination
 
-**`--rag` flag?** → Go to RAG MEMORY (skip Atlassian check)
+**`--rag` flag?**
+- If RAG_ENABLED: Go to RAG MEMORY
+- If not: "RAG Memory not configured. Run /devflow:admin:setup to enable." STOP
 
-**`--confluence` flag?** → Check Atlassian availability (Step 2)
+**`--docs` flag?**
+- If DOCS_ENABLED: Go to DOCS BACKEND (Confluence or Google Docs based on config)
+- If not: "No docs backend configured. Run /devflow:admin:setup to enable." STOP
 
-**`--both` flag?** → Check Atlassian availability (Step 2)
+**`--confluence` flag?**
+- Check Atlassian MCP availability
+- If available: Go to CONFLUENCE
+- If not: "Confluence unavailable. Store in RAG Memory instead?" Wait for response.
 
-**No flag?** → Check Atlassian availability (Step 2)
+**`--google` flag?**
+- Check Google Workspace MCP availability
+- If available: Go to GOOGLE DOCS
+- If not: "Google Docs unavailable. Store in RAG Memory instead?" Wait for response.
+
+**`--both` flag?** → Go to Step 2 (check what's available)
+
+**No flag?**
+- If only RAG_ENABLED: Go to RAG MEMORY (no need to ask)
+- If only DOCS_ENABLED: Go to DOCS BACKEND (no need to ask)
+- If both enabled: Go to Step 2
 
 ---
 
-## Step 2: Check Atlassian Availability
+## Step 2: Check Backend Availability
 
-Call `getAccessibleAtlassianResources()`.
+**If RAG_ENABLED:**
+Test: `mcp__rag-memory__list_collections`
+- Success → RAG available
+- Failure → RAG unavailable
 
-**Available?** → Go to Step 3
+**If DOCS_BACKEND = "confluence":**
+Test: `mcp__atlassian__getAccessibleAtlassianResources`
+- Success → Confluence available
+- Failure → Confluence unavailable
 
-**Not available?**
-- If `--confluence` was requested: "Confluence unavailable (Atlassian MCP not configured). Store in RAG Memory instead?" Wait for response.
-- If `--both` was requested: "Confluence unavailable. Proceeding with RAG Memory only." → Go to RAG MEMORY
-- If no flag: "Note: Confluence unavailable. Storing to RAG Memory." → Go to RAG MEMORY
+**If DOCS_BACKEND = "google-docs":**
+Test: `mcp__google-workspace__list_drive_items`
+- Success → Google Docs available
+- Failure → Google Docs unavailable
+
+**Route based on availability:**
+
+| RAG | Docs | Action |
+|-----|------|--------|
+| ✓ | ✓ | Ask user where to store (Step 3) |
+| ✓ | ✗ | "Note: [Docs backend] unavailable. Storing to RAG Memory." → RAG MEMORY |
+| ✗ | ✓ | "Note: RAG Memory unavailable. Storing to [Docs backend]." → DOCS BACKEND |
+| ✗ | ✗ | "Neither backend available. Check your MCP server connections." STOP |
 
 ---
 
-## Step 3: Route by Flag
+## Step 3: Route by User Choice
 
-**`--confluence`?** → Go to CONFLUENCE
-
-**`--both`?** → Go to BOTH
-
-**No flag?** → Ask user:
+Ask user:
 > Where would you like to store this?
 > 1. RAG Memory
-> 2. Confluence
+> 2. [Confluence/Google Docs] (based on config)
 > 3. Search both first, then decide
 > 4. Cancel
 
@@ -115,16 +176,31 @@ Summary:
 
 ---
 
+## GOOGLE DOCS
+
+Follow the workflow in [references/google-docs.md](references/google-docs.md).
+
+Summary:
+1. Search for existing related documents
+2. Classify content (update existing vs new document)
+3. Route accordingly:
+   - **Update existing** → Append to related document
+   - **New document** → Create in configured location
+
+---
+
 ## BOTH
 
 Search both systems, then let user decide.
 
 1. Discover RAG collections (see rag-memory.md)
-2. Get Confluence spaces (see confluence.md)
-3. Search both:
-   - `search_documents(query="[topic]", limit=5)`
-   - `search(query="[topic]")`
-4. Show results from both
-5. Ask: "Based on these results, where should I store this - RAG Memory or Confluence?"
-6. Route to chosen destination's workflow
+2. **If DOCS_BACKEND = "confluence":**
+   - Get Confluence spaces
+   - Search: `search(query="[topic]")`
+3. **If DOCS_BACKEND = "google-docs":**
+   - Search: `mcp__google-workspace__search_docs(query="[topic]")`
+4. Search RAG Memory: `search_documents(query="[topic]", limit=5)`
+5. Show results from both
+6. Ask: "Based on these results, where should I store this - RAG Memory or [Confluence/Google Docs]?"
+7. Route to chosen destination's workflow
 

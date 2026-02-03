@@ -1,16 +1,16 @@
 {
   "name": "claude-code-primitives",
-  "description": "Reusable Claude Code primitives for development workflows, knowledge management, and project management",
+  "description": "AI-native development workflow with multi-backend support",
   "owner": {
     "name": "Coding the Future with AI",
     "url": "https://github.com/codingthefuturewithai"
   },
   "plugins": [
     {
-      "name": "primitives-toolkit",
-      "description": "Complete toolkit: devflow commands (JIRA integration), knowledge management (RAG Memory + Confluence), PM commands, and protective hooks",
-      "version": "1.4.0",
-      "source": "./plugins/primitives-toolkit"
+      "name": "devflow",
+      "description": "Complete DevFlow toolkit: multi-backend issue tracking, documentation, PR/MR creation",
+      "version": "2.0.0",
+      "source": "./plugins/devflow"
     }
   ]
 }

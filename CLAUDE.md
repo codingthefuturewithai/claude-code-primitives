@@ -7,14 +7,25 @@ claude-code-primitives/
 ├── .claude-plugin/
 │   └── marketplace.json      # Marketplace metadata (VERSION HERE)
 ├── plugins/
-│   └── primitives-toolkit/
+│   └── devflow/
 │       ├── .claude-plugin/
 │       │   └── plugin.json   # Plugin metadata (VERSION HERE - must match marketplace.json)
+│       ├── adapters/         # Backend adapter reference files
+│       │   ├── issues/       # Jira, GitLab, Local issue adapters
+│       │   ├── docs/         # Confluence, Google Docs, Local doc adapters
+│       │   ├── vcs/          # GitHub, GitLab VCS adapters
+│       │   └── setup/        # MCP server setup instructions
 │       ├── commands/         # Slash commands for the plugin
-│       ├── skills/           # Skills for the plugin
+│       │   ├── admin/        # Setup and configuration commands
+│       │   ├── build/        # SDLC workflow commands (fetch, plan, implement, complete)
+│       │   ├── pm/           # Project management commands
+│       │   ├── rag-memory/   # RAG Memory setup commands
+│       │   ├── docs/         # Documentation audit commands
+│       │   └── devops/       # DevOps commands
+│       ├── skills/           # Symlinks to standalone skills
 │       └── hooks/            # Hooks for the plugin
 ├── commands/                 # Standalone commands (can be reused across plugins)
-├── skills/                   # Standalone skills (can be reused across plugins)
+├── skills/                   # Standalone skills with SKILL.md and references/
 └── hooks/                    # Standalone hooks
 ```
 
@@ -23,7 +34,7 @@ claude-code-primitives/
 When releasing a new version, update BOTH files with the same version number:
 
 1. **`.claude-plugin/marketplace.json`** - Line with `"version": "X.Y.Z"` inside the plugins array
-2. **`plugins/primitives-toolkit/.claude-plugin/plugin.json`** - Line with `"version": "X.Y.Z"`
+2. **`plugins/devflow/.claude-plugin/plugin.json`** - Line with `"version": "X.Y.Z"`
 
 These MUST match or the plugin will not work correctly.
 
@@ -38,24 +49,30 @@ After bumping versions and pushing changes:
 
 1. **From command line, update the plugin:**
    ```bash
-   claude plugin update primitives-toolkit@claude-code-primitives
+   claude plugin update devflow@claude-code-primitives
    ```
 
 2. **Then start Claude Code and install:**
    ```bash
    claude
    # Then run:
-   /plugin install primitives-toolkit@claude-code-primitives
+   /plugin install devflow@claude-code-primitives
    ```
 
 3. **Setup skills (required for skills to work):**
    ```
-   /primitives-toolkit:admin:setup-skills
+   /devflow:admin:setup-skills
    ```
    This creates symlinks in `~/.claude/skills/` for the plugin's skills.
 
-4. **Verify installation:**
-   - Run a slash command like `/devflow:workflow-guide`
+4. **First-time backend configuration:**
+   ```
+   /devflow:admin:setup
+   ```
+   This wizard configures your issue tracking (Jira/GitLab), documentation (Confluence/Google Docs/RAG Memory), and VCS (GitHub/GitLab) backends.
+
+5. **Verify installation:**
+   - Run a slash command like `/devflow:build:workflow-guide`
    - Check that your changes are reflected
 
 ### If you need a clean reinstall:
@@ -66,7 +83,7 @@ rm -rf ~/.claude/plugins/cache/claude-code-primitives
 rm -rf ~/.claude/plugins/marketplaces/claude-code-primitives
 
 # Remove entries from JSON files (edit these manually):
-# ~/.claude/plugins/installed_plugins.json - remove "primitives-toolkit@claude-code-primitives" entry
+# ~/.claude/plugins/installed_plugins.json - remove "devflow@claude-code-primitives" entry
 # ~/.claude/plugins/known_marketplaces.json - remove "claude-code-primitives" entry
 ```
 
@@ -74,13 +91,14 @@ Then start a new Claude Code session and:
 
 ```
 /plugin marketplace add codingthefuturewithai/claude-code-primitives
-/plugin install primitives-toolkit@claude-code-primitives
-/primitives-toolkit:admin:setup-skills
+/plugin install devflow@claude-code-primitives
+/devflow:admin:setup-skills
+/devflow:admin:setup
 ```
 
 ## File Organization Rules
 
-**DO NOT change the file structure.** If files exist as copies in multiple locations (e.g., `commands/` and `plugins/primitives-toolkit/commands/`), keep them as copies. Do not convert to symlinks or change the architecture unless explicitly asked.
+**DO NOT change the file structure.** If files exist as copies in multiple locations, keep them as copies. Do not convert to symlinks or change the architecture unless explicitly asked.
 
 **Only modify the specific files mentioned in the ticket.** No structural changes, no "improvements" to organization.
 
@@ -90,16 +108,39 @@ Then start a new Claude Code session and:
 |-----------|---------|
 | `commands/` | Standalone slash commands |
 | `skills/` | Standalone skills with SKILL.md and references/ |
-| `plugins/primitives-toolkit/commands/` | Plugin-specific commands |
-| `plugins/primitives-toolkit/skills/` | Plugin-specific skills |
-| `hooks/` | Pre/post tool use hooks |
-| `.devflow/plans/` | Implementation plans for JIRA issues |
+| `plugins/devflow/adapters/` | Backend adapter patterns and setup instructions |
+| `plugins/devflow/commands/build/` | SDLC workflow commands |
+| `plugins/devflow/commands/admin/` | Setup and configuration |
+| `plugins/devflow/hooks/` | Pre/post tool use hooks |
+| `.devflow/plans/` | Implementation plans for issues |
 
-## Common Slash Commands in This Plugin
+## Supported Backends
 
-- `/devflow:fetch-issue` - Fetch JIRA issue and analyze feasibility
-- `/devflow:plan-work` - Create implementation plan
-- `/devflow:implement-plan` - Execute approved plan
-- `/devflow:complete-issue` - Create PR and close issue
-- `/rag-memory:setup-collections` - Scaffold RAG Memory collections
-- `/knowledge-management` - Route content to RAG Memory or Confluence
+| Component | Options |
+|-----------|---------|
+| Issues | Jira (Atlassian MCP), GitLab (GitLab MCP) |
+| Documentation | Confluence (Atlassian MCP), Google Docs (Google Workspace MCP), RAG Memory |
+| VCS | GitHub (gh CLI), GitLab (GitLab MCP) |
+
+## Common Slash Commands
+
+### Build Workflow (SDLC)
+- `/devflow:build:fetch-issue` - Fetch issue and analyze feasibility
+- `/devflow:build:plan-work` - Create implementation plan
+- `/devflow:build:implement-plan` - Execute approved plan
+- `/devflow:build:security-review` - Security analysis
+- `/devflow:build:complete-issue` - Create PR/MR and close issue
+- `/devflow:build:post-merge` - Cleanup after merge
+- `/devflow:build:create-issue` - Create new issue
+- `/devflow:build:workflow-guide` - Workflow overview
+
+### Admin
+- `/devflow:admin:setup` - Configure backends (Jira/GitLab, Confluence/Google Docs, GitHub/GitLab)
+- `/devflow:admin:setup-skills` - Create skill symlinks
+
+### RAG Memory
+- `/devflow:rag-memory:setup-collections` - Scaffold RAG Memory collections
+- `/devflow:rag-memory:create-agent-preferences` - Create agent preferences collection
+
+### Skills
+- `/knowledge-management` - Route content to RAG Memory or docs backend
