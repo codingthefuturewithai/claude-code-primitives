@@ -20,36 +20,14 @@ Request: $ARGUMENTS
 
 ---
 
-## Step 0: Load Backend Configuration
+## Step 1: Load Configuration and Connect to Backend
 
-## Note for AI Assistants - CONFIG LOADING
+Use the **build-ops** skill to:
+1. Load backend configuration from `devflow-config.md`
+2. Connect to the configured issue tracker and discover available projects
 
-1. Check for config file:
-   ```bash
-   if [ -f ".claude/devflow-config.md" ]; then
-     CONFIG_PATH=".claude/devflow-config.md"
-   elif [ -f "$HOME/.claude/devflow-config.md" ]; then
-     CONFIG_PATH="$HOME/.claude/devflow-config.md"
-   else
-     CONFIG_PATH=""
-   fi
-   ```
-
-2. **If config exists:** Read and parse:
-   - Extract `issues.backend` (jira, gitlab, github, none)
-   - For Jira: Extract `cloudId` if saved
-   - For GitLab: Extract `default_project` if saved
-   - For GitHub: Uses current repo context
-
-3. **If no config exists:**
-   - Default to Jira (backwards compatible)
-   - Suggest: "Tip: Run /devflow:admin:setup to configure backends"
-
-4. Store ISSUES_BACKEND for use in Step 1
-
----
-
-## Step 1: Gather Information
+The build-ops skill handles all backend-specific operations (Jira, GitLab, GitHub)
+and enforces parameter validation. See `skills/build-ops/SKILL.md`.
 
 **🚨 CRITICAL: Ask ONE question at a time. Wait for user response before next question.**
 
@@ -57,69 +35,13 @@ Request: $ARGUMENTS
 
 ---
 
-[If ISSUES_BACKEND = "jira"]:
+**Project Selection:**
 
-**Get Atlassian Connection:**
+Use the build-ops skill's project discovery to list available projects.
 
-[Call `mcp__atlassian__getAccessibleAtlassianResources` - authentication handled by MCP]
+Ask ONLY: "Which project?" [Display projects from backend]
 
-[Extract cloudId from response - user has single instance]
-
-Say: "Connected to Atlassian"
-
----
-
-**Get Project:**
-
-[Call `mcp__atlassian__getVisibleJiraProjects`]
-
-Ask ONLY: "Which project?" [Display: KEY - Name]
-
-**WAIT.** Store projectKey.
-
----
-
-[If ISSUES_BACKEND = "gitlab"]:
-
-**Get GitLab Projects:**
-
-[Call `mcp__gitlab__list_projects`]
-
-Ask ONLY: "Which project?" [Display: path_with_namespace - name]
-
-**WAIT.** Store project_id.
-
----
-
-[If ISSUES_BACKEND = "github"]:
-
-**Verify gh CLI:**
-
-```bash
-which gh && gh auth status
-```
-
-If gh is not installed or not authenticated, STOP and inform user:
-> "GitHub CLI (gh) is required but not available.
-> - Install: `brew install gh` (macOS) or see https://github.com/cli/cli
-> - Authenticate: `gh auth login`"
-
-**Get current repo:**
-```bash
-gh repo view --json nameWithOwner -q '.nameWithOwner'
-```
-
-Say: "Using GitHub repository: [owner/repo]"
-
----
-
-[If ISSUES_BACKEND = "none"]:
-
-**Local Issue:**
-
-Say: "No issue tracker configured. I can help you draft an issue description for local tracking."
-
-Proceed with gathering information but skip API calls.
+**WAIT.** Store selected project identifier.
 
 ---
 
@@ -313,31 +235,18 @@ Options: "Yes / Edit / Cancel"
 
 [Only if approved]
 
-[If ISSUES_BACKEND = "jira"]:
-[Call `mcp__atlassian__createJiraIssue`]
-Return: Issue key, URL, suggested branch name.
+Use the **build-ops** skill to create the issue in the configured backend with:
+- Project: [selected project from Step 1]
+- Type: [selected type]
+- Title: [approved title]
+- Description: [approved description]
+- Labels: [approved labels]
+- Priority: [selected priority]
 
-[If ISSUES_BACKEND = "gitlab"]:
-[Call `mcp__gitlab__create_issue` with:
-  - project_id
-  - title
-  - description
-  - labels (comma-separated)
-]
-Return: Issue IID, web_url, suggested branch name.
+The build-ops skill handles all backend-specific creation logic and enforces
+parameter validation. See `skills/build-ops/SKILL.md`.
 
-[If ISSUES_BACKEND = "github"]:
-```bash
-gh issue create \
-  --title "[title]" \
-  --body "[description]" \
-  --label "[labels comma-separated]"
-```
-Return: Issue number, URL, suggested branch name.
-
-[If ISSUES_BACKEND = "none"]:
-Display: "Issue drafted. Copy the description above for your local tracking."
-Suggest: "Run /devflow:admin:setup to connect an issue tracker."
+Return: Issue key/number, URL, suggested branch name.
 
 ---
 

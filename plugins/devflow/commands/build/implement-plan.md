@@ -24,25 +24,11 @@ I'll execute the approved implementation plan for $ARGUMENTS.
 ## Note for AI Assistants - CONFIG & PLAN LOADING
 
 **Load configuration:**
-1. Check for config file:
-   ```bash
-   if [ -f ".claude/devflow-config.md" ]; then
-     CONFIG_PATH=".claude/devflow-config.md"
-   elif [ -f "$HOME/.claude/devflow-config.md" ]; then
-     CONFIG_PATH="$HOME/.claude/devflow-config.md"
-   else
-     CONFIG_PATH=""
-   fi
-   ```
 
-2. **If config exists:** Read and parse:
-   - Extract `issues.backend` (jira, gitlab, github, none)
-   - For Jira: Extract `cloudId` if saved
-   - For GitLab: Extract `default_project` if saved
-   - For GitHub: Uses current repo context
+Use the **build-ops** skill to load backend configuration from `devflow-config.md`.
 
-3. **If no config exists:**
-   - Default to Jira (backwards compatible)
+The build-ops skill handles config loading and parameter validation.
+See `skills/build-ops/SKILL.md`.
 
 **Load implementation plan:**
 1. Use Read tool to load `.devflow/plans/$ARGUMENTS.md`
@@ -154,49 +140,11 @@ git checkout -b [branch-name]
 
 ## Step 2: Update Issue Status
 
-## Note for AI Assistants - ISSUE UPDATE
+Use the **build-ops** skill to transition issue $ARGUMENTS to "In Progress".
 
-**If ISSUES_BACKEND = "jira":**
-
-1. Call `mcp__atlassian__getAccessibleAtlassianResources` to get cloud ID
-2. Extract cloudId from the response (first item in array)
-3. Call `mcp__atlassian__getJiraIssue` with:
-   - cloudId
-   - issueIdOrKey = $ARGUMENTS
-   - fields = ["status"]
-4. Extract current status from response: `fields.status.name`
-5. **If current status is already "In Progress":**
-   - Skip transition (already set)
-   - Display: "✅ JIRA: In Progress (already set)"
-   - Proceed to next step
-6. **If current status is NOT "In Progress":**
-   - Call `mcp__atlassian__getTransitionsForJiraIssue` with cloudId and issue key
-   - Find transition where `to.name` equals "In Progress"
-   - Extract the `id` field from that transition (e.g., "21")
-   - Call `mcp__atlassian__transitionJiraIssue` with the transition
-   - Display: "✅ JIRA: In Progress"
-
-**If ISSUES_BACKEND = "gitlab":**
-
-1. Call `mcp__gitlab__update_issue` to add "In Progress" label
-   - project_id: [from config or derived]
-   - issue_iid: $ARGUMENTS
-   - labels: add "In Progress" to existing labels
-2. Display: "✅ GitLab Issue: In Progress"
-
-**If ISSUES_BACKEND = "github":**
-
-1. Verify gh CLI is available: `which gh && gh auth status`
-2. If not available, STOP and inform user to install/authenticate gh CLI
-3. Add "in-progress" label to issue:
-   ```bash
-   gh issue edit $ARGUMENTS --add-label "in-progress"
-   ```
-4. Display: "✅ GitHub Issue: In Progress"
-
-**If ISSUES_BACKEND = "none":**
-
-Skip issue status update.
+The build-ops skill handles all backend-specific transition logic (Jira transitions,
+GitLab labels, GitHub labels, etc.) and enforces parameter validation.
+See `skills/build-ops/SKILL.md`.
 
 ---
 

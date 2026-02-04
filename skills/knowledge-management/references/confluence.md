@@ -2,15 +2,22 @@
 
 ## Confluence Workflow
 
-### Step 1: Get Available Spaces
+### Step 1: Get Cloud ID and Available Spaces
 
-Call `getConfluenceSpaces()` to list available spaces.
+Call `mcp__atlassian__getAccessibleAtlassianResources` (no parameters needed - discovery call).
+
+Extract `cloudId` from response. [FROM: config `cloudId` OR this response. NEVER fabricate.]
+
+Call `mcp__atlassian__getConfluenceSpaces` to list available spaces.
 
 ### Step 2: Search for Related Content
 
 ```
-search(query="What documentation exists about [topic]?")
+Call mcp__atlassian__search with:
+  - query: "What documentation exists about [topic]?"
 ```
+
+- query: [FROM: user topic. Content, not identifier - OK to construct.]
 
 Show results to user.
 
@@ -40,8 +47,13 @@ If no related page found → Go to Create New Page Workflow (no need to ask)
 
 Append new content to an existing page.
 
-1. Extract `pageId` from search results
-2. Get current content if needed: `getConfluencePage(cloudId, pageId)`
+1. Extract `pageId` from search results. [FROM: search results. NEVER fabricate.]
+2. Get current content if needed:
+   ```
+   Call mcp__atlassian__getConfluencePage with:
+     - cloudId: [FROM: config "cloudId" OR getAccessibleAtlassianResources response. NEVER fabricate.]
+     - pageId: [FROM: search results. NEVER fabricate.]
+   ```
 3. Append with timestamp:
    ```
    [existing content]
@@ -51,7 +63,14 @@ Append new content to an existing page.
    **Added [YYYY-MM-DD HH:MM]:**
    [new content]
    ```
-4. Update: `updateConfluencePage(cloudId, pageId, title, updatedContent)`
+4. Update:
+   ```
+   Call mcp__atlassian__updateConfluencePage with:
+     - cloudId: [FROM: config "cloudId" OR getAccessibleAtlassianResources response. NEVER fabricate.]
+     - pageId: [FROM: search results. NEVER fabricate.]
+     - title: [FROM: existing page title. NEVER change without user consent.]
+     - content: [FROM: generated updated content. OK to construct.]
+   ```
 5. Confirm success
 
 ---
@@ -65,12 +84,11 @@ Present available spaces from Step 1. Let user choose.
 ### Create Page
 
 ```
-createConfluencePage(
-    cloudId="[from getAccessibleAtlassianResources]",
-    spaceId="[user's choice]",
-    title="[suggested title]",
-    content="[user's exact content - do not modify]"
-)
+Call mcp__atlassian__createConfluencePage with:
+  - cloudId: [FROM: config "cloudId" OR getAccessibleAtlassianResources response. NEVER fabricate.]
+  - spaceId: [FROM: getConfluenceSpaces response + user selection. NEVER guess.]
+  - title: [FROM: user input or suggested title. OK to suggest.]
+  - content: [FROM: user's exact content - do not modify.]
 ```
 
 Confirm success with link to new page.
@@ -79,51 +97,51 @@ Confirm success with link to new page.
 
 ## Tool Parameters
 
-### getAccessibleAtlassianResources()
+### mcp__atlassian__getAccessibleAtlassianResources
 
 No parameters required. Returns cloud ID needed for other operations.
 
-### getConfluenceSpaces()
+### mcp__atlassian__getConfluenceSpaces
 
 No parameters required. Returns list of available spaces with:
 - `id` - Space ID
 - `key` - Space key
 - `name` - Space name
 
-### search(query)
+### mcp__atlassian__search
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| query | string | Yes | Natural language question |
+| Parameter | Type | Required | Description | Source |
+|-----------|------|----------|-------------|--------|
+| query | string | Yes | Natural language question | User topic - OK to construct |
 
 This is the semantic search tool. Use this for duplicate/related content checking.
 
-### getConfluencePage(cloudId, pageId)
+### mcp__atlassian__getConfluencePage
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| cloudId | string | Yes | From getAccessibleAtlassianResources |
-| pageId | string | Yes | Page ID from search results |
+| Parameter | Type | Required | Description | Source |
+|-----------|------|----------|-------------|--------|
+| cloudId | string | Yes | Atlassian cloud instance ID | Config `cloudId` OR `getAccessibleAtlassianResources` |
+| pageId | string | Yes | Page ID | Search results. NEVER fabricate. |
 
 Returns page content. Use when you need existing content before appending.
 
-### createConfluencePage(cloudId, spaceId, title, content)
+### mcp__atlassian__createConfluencePage
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| cloudId | string | Yes | From getAccessibleAtlassianResources |
-| spaceId | string | Yes | Target space ID |
-| title | string | Yes | Page title |
-| content | string | Yes | Page content (supports wiki markup) |
+| Parameter | Type | Required | Description | Source |
+|-----------|------|----------|-------------|--------|
+| cloudId | string | Yes | Atlassian cloud instance ID | Config `cloudId` OR `getAccessibleAtlassianResources` |
+| spaceId | string | Yes | Target space ID | `getConfluenceSpaces` + user selection |
+| title | string | Yes | Page title | User input - OK to suggest |
+| content | string | Yes | Page content (supports wiki markup) | User content |
 
-### updateConfluencePage(cloudId, pageId, title, content)
+### mcp__atlassian__updateConfluencePage
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| cloudId | string | Yes | From getAccessibleAtlassianResources |
-| pageId | string | Yes | Existing page ID |
-| title | string | Yes | Updated title |
-| content | string | Yes | Updated content |
+| Parameter | Type | Required | Description | Source |
+|-----------|------|----------|-------------|--------|
+| cloudId | string | Yes | Atlassian cloud instance ID | Config `cloudId` OR `getAccessibleAtlassianResources` |
+| pageId | string | Yes | Existing page ID | Search results. NEVER fabricate. |
+| title | string | Yes | Updated title | Existing page title |
+| content | string | Yes | Updated content | Generated - OK to construct |
 
 ---
 
@@ -140,3 +158,16 @@ Do NOT use `getPagesInConfluenceSpace()` as a search substitute. It lists pages,
 ### Updating vs Creating
 
 If search finds similar content, offer to update the existing page instead of creating a duplicate.
+
+---
+
+## Parameter Sources
+
+| Parameter | Authorized Source | NEVER |
+|-----------|------------------|-------|
+| cloudId | Config `cloudId` OR `getAccessibleAtlassianResources` response | Guess, infer, construct |
+| pageId | Search results | Fabricate or guess |
+| spaceId | `getConfluenceSpaces` + user selection | Guess or hardcode |
+| title | User input or existing page title | N/A (content) |
+| content | User input or generated | N/A (content) |
+| query | User topic (content, not identifier) | N/A |

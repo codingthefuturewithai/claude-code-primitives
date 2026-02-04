@@ -16,93 +16,16 @@ Issue: $ARGUMENTS
 
 ---
 
-## Step 0: Load Backend Configuration
+## Step 1: Load Configuration and Fetch Issue
 
-## Note for AI Assistants - CONFIG LOADING
+Use the **build-ops** skill to:
+1. Load backend configuration from `devflow-config.md`
+2. Fetch issue $ARGUMENTS from the configured issue tracker
 
-1. Check for config file:
-   ```bash
-   if [ -f ".claude/devflow-config.md" ]; then
-     CONFIG_PATH=".claude/devflow-config.md"
-   elif [ -f "$HOME/.claude/devflow-config.md" ]; then
-     CONFIG_PATH="$HOME/.claude/devflow-config.md"
-   else
-     CONFIG_PATH=""
-   fi
-   ```
+The build-ops skill handles all backend-specific operations (Jira, GitLab, GitHub)
+and enforces parameter validation. See `skills/build-ops/SKILL.md`.
 
-2. **If config exists:** Read and parse:
-   - Extract `issues.backend` (jira, gitlab, github, or none)
-   - Extract `issues.enabled` (true/false)
-   - For Jira: Extract `cloudId` if saved
-   - For GitLab: Extract `default_project` if saved
-   - For GitHub: Uses current repo context
-
-3. **If no config exists:**
-   - Default to Atlassian/Jira (backwards compatible)
-   - Suggest: "Tip: Run /devflow:admin:setup to configure backends"
-
-4. Store ISSUES_BACKEND for use in Step 1
-
-**Backend determines adapter to use:**
-- `jira` → Follow patterns in `adapters/issues/jira.md`
-- `gitlab` → Follow patterns in `adapters/issues/gitlab.md`
-- `github` → Follow patterns in `adapters/issues/github.md`
-- `none` → Skip issue fetch, proceed with local analysis only
-
----
-
-## Step 1: Fetch Issue from Issue Tracker
-
-[If ISSUES_BACKEND = "jira"]:
-
-**Using Jira via Atlassian MCP**
-
-[Call `mcp__atlassian__getAccessibleAtlassianResources`]
-[Call `mcp__atlassian__getJiraIssue` with cloudId and issue key]
-
----
-
-[If ISSUES_BACKEND = "gitlab"]:
-
-**Using GitLab Issues via GitLab MCP**
-
-[Call `mcp__gitlab__get_issue` with project_id and issue_iid]
-
-**Note:** GitLab uses `iid` (project-specific issue number).
-If $ARGUMENTS is just a number (e.g., "123"), use it as iid.
-If $ARGUMENTS includes project (e.g., "my-project/123"), parse accordingly.
-
----
-
-[If ISSUES_BACKEND = "github"]:
-
-**Using GitHub Issues via gh CLI**
-
-**First, verify gh CLI is available:**
-```bash
-which gh && gh auth status
-```
-
-If gh is not installed or not authenticated, STOP and inform user:
-> "GitHub CLI (gh) is required but not available.
-> - Install: `brew install gh` (macOS) or see https://github.com/cli/cli
-> - Authenticate: `gh auth login`"
-
-**Fetch issue:**
-```bash
-gh issue view $ARGUMENTS --json number,title,body,state,labels,assignees,url
-```
-
-**Note:** $ARGUMENTS should be the issue number (e.g., "123").
-
----
-
-[If ISSUES_BACKEND = "none"]:
-
-**Issue tracking disabled**
-
-No external issue tracker configured. Proceeding with local codebase analysis.
+Store the returned issue details for use in subsequent steps.
 
 ---
 

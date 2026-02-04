@@ -47,6 +47,13 @@ Load DevFlow configuration to determine what's available.
 - `docs.enabled` - Is a docs backend enabled?
 - `docs.backend` - Which one? (confluence, google-docs)
 - `rag-memory.routing` - How to route content (decide-each-time, quick-to-rag, all-to-rag)
+- `google_email` - User's Google email (CRITICAL for Google Workspace calls)
+
+Store:
+- RAG_ENABLED: true/false
+- DOCS_ENABLED: true/false
+- DOCS_BACKEND: confluence/google-docs/none
+- GOOGLE_EMAIL: value from config `google_email` (may be empty)
 
 **Availability check:**
 
@@ -57,10 +64,37 @@ Load DevFlow configuration to determine what's available.
 | Disabled | Enabled | Docs backend only |
 | Disabled | Disabled | Inform user to run `/devflow:admin:setup` and STOP |
 
-Store:
-- RAG_ENABLED: true/false
-- DOCS_ENABLED: true/false
-- DOCS_BACKEND: confluence/google-docs/none
+---
+
+## Parameter Validation Gate (MANDATORY)
+
+**Before ANY MCP tool call in this skill, validate EVERY parameter.**
+
+For EVERY parameter on EVERY call, verify where the value came from:
+
+| Source | Allowed? | Action |
+|--------|----------|--------|
+| Value from `devflow-config.md` read in Step 0 | **YES** | Use it |
+| Value returned from a PREVIOUS call to the SAME backend's MCP server | **YES** | Use it |
+| Value provided by the user in this conversation | **YES** | Use it |
+| Value from a DIFFERENT backend's MCP server | **NO** | STOP. Backends are isolated. |
+| Value that "looks right" or was inferred | **NO** | STOP. ASK the user. |
+
+### Google Workspace (CRITICAL)
+
+- `user_google_email`: ALWAYS read from config `google_email` (stored as GOOGLE_EMAIL in Step 0). NEVER infer from Atlassian, GitLab, or any other source.
+- If config has no `google_email` → ASK the user: "What is your Google email address?" Do NOT proceed without it.
+
+### Confluence
+
+- `cloudId`: Read from config `cloudId` OR call `getAccessibleAtlassianResources`. NEVER fabricate.
+
+### RAG Memory
+
+- `actor_type`: Self-identify (already required in Self-Identification section above).
+- `collection_name`: From `list_collections` + user selection. NEVER guess.
+
+---
 
 ## Flags
 
@@ -119,7 +153,8 @@ Test: `mcp__atlassian__getAccessibleAtlassianResources`
 - Failure → Confluence unavailable
 
 **If DOCS_BACKEND = "google-docs":**
-Test: `mcp__google-workspace__list_drive_items`
+Test: `mcp__google-workspace__list_drive_items` with:
+  - user_google_email: [FROM: GOOGLE_EMAIL (config `google_email`). If missing, ASK user and STOP.]
 - Success → Google Docs available
 - Failure → Google Docs unavailable
 

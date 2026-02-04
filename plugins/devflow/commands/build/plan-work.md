@@ -15,60 +15,16 @@ I'll analyze issue $ARGUMENTS and create a detailed implementation plan.
 
 ---
 
-## Step 0: Load Backend Configuration
+## Step 1: Load Configuration and Fetch Issue
 
-## Note for AI Assistants - CONFIG LOADING
+Use the **build-ops** skill to:
+1. Load backend configuration from `devflow-config.md`
+2. Fetch issue $ARGUMENTS from the configured issue tracker
 
-1. Check for config file:
-   ```bash
-   if [ -f ".claude/devflow-config.md" ]; then
-     CONFIG_PATH=".claude/devflow-config.md"
-   elif [ -f "$HOME/.claude/devflow-config.md" ]; then
-     CONFIG_PATH="$HOME/.claude/devflow-config.md"
-   else
-     CONFIG_PATH=""
-   fi
-   ```
+The build-ops skill handles all backend-specific operations (Jira, GitLab, GitHub)
+and enforces parameter validation. See `skills/build-ops/SKILL.md`.
 
-2. **If config exists:** Read and parse:
-   - Extract `issues.backend` (jira, gitlab, github, none)
-   - For Jira: Extract `cloudId` if saved
-   - For GitLab: Extract `default_project` if saved
-   - For GitHub: Uses current repo context
-
-3. **If no config exists:**
-   - Default to Jira (backwards compatible)
-   - Suggest: "Tip: Run /devflow:admin:setup to configure backends"
-
-4. Store ISSUES_BACKEND for use in Step 1
-
----
-
-## Step 1: Fetch Issue
-
-Let me fetch the full issue details.
-
-## Note for AI Assistants - FETCH PHASE
-
-**If ISSUES_BACKEND = "jira":**
-1. Use `mcp__atlassian__getAccessibleAtlassianResources` to get cloud ID
-2. Use `mcp__atlassian__getJiraIssue` with $ARGUMENTS to fetch full issue details
-3. Extract: Summary, Description, Acceptance Criteria, Issue Type
-
-**If ISSUES_BACKEND = "gitlab":**
-1. Use `mcp__gitlab__get_issue` with project_id and iid
-2. Extract: Title, Description, Labels
-
-**If ISSUES_BACKEND = "github":**
-1. Verify gh CLI is available: `which gh && gh auth status`
-2. If not available, STOP and inform user to install/authenticate gh CLI
-3. Use `gh issue view $ARGUMENTS --json number,title,body,state,labels`
-4. Extract: Title (title), Description (body), Labels (labels)
-
-**If ISSUES_BACKEND = "none":**
-1. Skip issue fetch
-2. Ask user for requirements or use $ARGUMENTS as description
-
+3. Extract: Summary, Description, Acceptance Criteria, Issue Type/Labels
 4. Check if $ARGUMENTS contains --tdd flag (if yes: TDD Mode ENABLED; if no: DISABLED)
 5. Proceed to Step 2
 

@@ -68,13 +68,17 @@ search_documents(
 )
 ```
 
+- collection_name: [FROM: hardcoded "agent-preferences". This is a known system collection.]
+- query: [FROM: user topic. Content, not identifier - OK to construct.]
+
 - If rules are found → Follow them exactly, skip to Step 6
 - If no rules found → Proceed to Step 5
 
 ### Step 5: Collection Discovery (only if no preference found)
 
-1. Call `list_collections()` to get all collections
-2. For relevant collections, call `get_collection_metadata_schema(collection_name)`
+1. Call `list_collections()` to get all collections. [FROM: no params needed - discovery call.]
+2. For relevant collections, call `get_collection_metadata_schema(collection_name)`:
+   - collection_name: [FROM: `list_collections` response. NEVER guess.]
 3. Use `routing.examples` and `routing.exclusions` to score collections
 4. Present top 2-3 collections with reasoning to user
 
@@ -97,7 +101,10 @@ Use the appropriate tool based on input type:
 - File path → `ingest_file()`
 - Raw text → `ingest_text()`
 
-Always include: `collection_name`, `topic`, `actor_type`
+Always include:
+- `collection_name`: [FROM: `list_collections` response + user selection (Step 5-6). NEVER guess.]
+- `topic`: [FROM: user input or generated from content preview. OK to construct.]
+- `actor_type`: [FROM: self-identification. Reflect on your product name. NEVER guess.]
 
 ### Step 8: Offer to Save Preference (if applicable)
 
@@ -136,7 +143,8 @@ Quick notes go to the dedicated `quick-notes` system collection as individual do
 
 When `--update` flag is set and related content was found:
 
-1. Get document content: `get_document_by_id(document_id)`
+1. Get document content:
+   - `get_document_by_id(document_id)` with document_id: [FROM: `search_documents` or `list_documents` results. NEVER fabricate.]
 2. Append with timestamp:
    ```
    [existing content]
@@ -146,7 +154,7 @@ When `--update` flag is set and related content was found:
    **Added [YYYY-MM-DD HH:MM]:**
    [new content]
    ```
-3. Update: `update_document(document_id, content=updated_content)`
+3. Update: `update_document(document_id, content=updated_content)` with document_id: [FROM: `search_documents` or `list_documents` results. NEVER fabricate.]
 4. Confirm success
 
 ---
@@ -155,11 +163,11 @@ When `--update` flag is set and related content was found:
 
 ### search_documents(query, collection_name, ...)
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| query | string | Yes | Natural language question |
-| collection_name | string | No | Limit to specific collection |
-| limit | int | No | Max results (default 5) |
+| Parameter | Type | Required | Description | Source |
+|-----------|------|----------|-------------|--------|
+| query | string | Yes | Natural language question | User topic - OK to construct |
+| collection_name | string | No | Limit to specific collection | `list_collections` + user selection |
+| limit | int | No | Max results (default 5) | Default or user preference |
 
 ### list_collections()
 
@@ -167,9 +175,9 @@ No parameters required. Returns array of collection names.
 
 ### get_collection_metadata_schema(collection_name)
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| collection_name | string | Yes | Name of collection |
+| Parameter | Type | Required | Description | Source |
+|-----------|------|----------|-------------|--------|
+| collection_name | string | Yes | Name of collection | `list_collections` response. NEVER guess. |
 
 Returns: `name`, `domain`, `domain_scope`, `description`, plus:
 - `metadata_schema.routing.examples` - Content that SHOULD route here
@@ -177,49 +185,49 @@ Returns: `name`, `domain`, `domain_scope`, `description`, plus:
 
 ### ingest_text(content, collection_name, topic, ...)
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| content | string | Yes | Text content |
-| collection_name | string | Yes | Target collection |
-| topic | string | Yes | Topic for relevance |
-| mode | string | No | "ingest" (default) or "reingest" |
-| actor_type | string | **Yes** | Your AI assistant name |
+| Parameter | Type | Required | Description | Source |
+|-----------|------|----------|-------------|--------|
+| content | string | Yes | Text content | User input |
+| collection_name | string | Yes | Target collection | `list_collections` + user selection. NEVER guess. |
+| topic | string | Yes | Topic for relevance | User input or generated. OK to construct. |
+| mode | string | No | "ingest" (default) or "reingest" | Workflow logic |
+| actor_type | string | **Yes** | Your AI assistant name | Self-identification. NEVER guess. |
 
 ### ingest_url(url, collection_name, topic, ...)
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| url | string | Yes | URL to ingest |
-| collection_name | string | Yes | Target collection |
-| topic | string | Yes | Topic for relevance |
-| follow_links | bool | No | Crawl linked pages |
-| max_pages | int | No | Max pages (default 10, max 20) |
-| mode | string | No | "ingest" (default) or "reingest" |
-| actor_type | string | **Yes** | Your AI assistant name |
+| Parameter | Type | Required | Description | Source |
+|-----------|------|----------|-------------|--------|
+| url | string | Yes | URL to ingest | User input. NEVER construct. |
+| collection_name | string | Yes | Target collection | `list_collections` + user selection. NEVER guess. |
+| topic | string | Yes | Topic for relevance | User input or generated. OK to construct. |
+| follow_links | bool | No | Crawl linked pages | User preference |
+| max_pages | int | No | Max pages (default 10, max 20) | User preference or default |
+| mode | string | No | "ingest" (default) or "reingest" | Workflow logic |
+| actor_type | string | **Yes** | Your AI assistant name | Self-identification. NEVER guess. |
 
 ### ingest_file(file_path, collection_name, topic, ...)
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| file_path | string | Yes | Local file path |
-| collection_name | string | Yes | Target collection |
-| topic | string | Yes | Topic for relevance |
-| mode | string | No | "ingest" (default) or "reingest" |
-| actor_type | string | **Yes** | Your AI assistant name |
+| Parameter | Type | Required | Description | Source |
+|-----------|------|----------|-------------|--------|
+| file_path | string | Yes | Local file path | User input. NEVER construct. |
+| collection_name | string | Yes | Target collection | `list_collections` + user selection. NEVER guess. |
+| topic | string | Yes | Topic for relevance | User input or generated. OK to construct. |
+| mode | string | No | "ingest" (default) or "reingest" | Workflow logic |
+| actor_type | string | **Yes** | Your AI assistant name | Self-identification. NEVER guess. |
 
 ### get_document_by_id(document_id)
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| document_id | string | Yes | Document ID |
+| Parameter | Type | Required | Description | Source |
+|-----------|------|----------|-------------|--------|
+| document_id | string | Yes | Document ID | `search_documents` or `list_documents` results. NEVER fabricate. |
 
 ### update_document(document_id, content, ...)
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| document_id | string | Yes | Document to update |
-| content | string | No | New content (triggers re-chunking) |
-| metadata | dict | No | Updated metadata |
+| Parameter | Type | Required | Description | Source |
+|-----------|------|----------|-------------|--------|
+| document_id | string | Yes | Document to update | `search_documents` or `list_documents` results. NEVER fabricate. |
+| content | string | No | New content (triggers re-chunking) | Generated content |
+| metadata | dict | No | Updated metadata | User input or workflow logic |
 
 ---
 
@@ -241,3 +249,17 @@ For URLs with many pages:
 ### File Access
 
 `ingest_file` requires the file to exist on the MCP server's filesystem. For cloud-hosted clients, use `ingest_text` with the file content instead.
+
+---
+
+## Parameter Sources
+
+| Parameter | Authorized Source | NEVER |
+|-----------|------------------|-------|
+| collection_name | `list_collections` response + user selection | Guess or assume collection exists |
+| actor_type | Self-identification (your product name) | Guess, use model name, or hardcode |
+| document_id | `search_documents` or `list_documents` results | Fabricate or guess |
+| url | User input | Construct or modify |
+| file_path | User input | Construct or guess |
+| topic | User input or generated from content preview | N/A (content, not identifier) |
+| query | User topic (content, not identifier) | N/A |
