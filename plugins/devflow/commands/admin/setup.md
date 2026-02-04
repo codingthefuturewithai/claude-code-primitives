@@ -136,17 +136,32 @@ Call mcp__atlassian__getAccessibleAtlassianResources
 
 ### If Google Docs selected:
 
+**Ask user which Google account to use:**
+> "Which Google account should DevFlow use?"
+
+**CRITICAL:** Do NOT guess the email. Do NOT reuse emails from other services (Atlassian, GitLab, etc.). ASK the user directly.
+
+Store the user's response as GOOGLE_EMAIL.
+
 **Test Google Workspace MCP:**
 ```
-Call mcp__google-workspace__list_drive_items
+Call mcp__google-workspace__list_drive_items with:
+  - user_google_email: [GOOGLE_EMAIL from user's answer above]
+  - page_size: 1
 ```
 
-- **Success:** Continue
-- **Failure:**
+**IMPORTANT:** Always pass the `user_google_email` the user provided. NEVER infer or guess this value from other context.
+
+- **Success:** Continue. Store GOOGLE_EMAIL in config.
+- **Failure (auth needed):**
+  > "Google authentication needed for [GOOGLE_EMAIL]. Please follow the authorization link above, then I'll retry."
+  Retry once after user confirms auth is done.
+- **Failure (persistent):**
   > "Google Workspace MCP not available. Would you like:"
   > 1. Help setting it up (show instructions)
-  > 2. Try a different option
-  > 3. Skip documentation
+  > 2. Try a different email account
+  > 3. Try a different option
+  > 4. Skip documentation
 
 If help requested, read and display: `adapters/setup/google-workspace-mcp.md`
 
@@ -291,6 +306,8 @@ default_project: [if gitlab, optional]
 backend: [confluence/google-docs/none]
 enabled: [true/false]
 organization: [manual/default-folder/ask-each-time]
+# For Google Docs:
+google_email: [user's Google email - ALWAYS pass this on Google Workspace calls]
 # For Google Docs with default-folder:
 default_folder_id: [folder id]
 # For Confluence:

@@ -15,6 +15,16 @@ Document ID can be extracted from URLs:
 https://docs.google.com/document/d/[DOCUMENT_ID]/edit
 ```
 
+### Google Email (CRITICAL)
+
+**ALWAYS** pass `user_google_email` from the DevFlow config on every Google Workspace MCP call.
+
+```
+Read devflow-config.md → Extract google_email value → Pass as user_google_email
+```
+
+**NEVER** guess or infer the Google email from other context (Atlassian, GitLab, etc.). The user explicitly chose this email during `/devflow:admin:setup`.
+
 ---
 
 ## Operations
