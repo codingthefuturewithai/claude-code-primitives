@@ -62,7 +62,7 @@ Store:
 | Enabled | Enabled | Full routing available |
 | Enabled | Disabled | RAG Memory only |
 | Disabled | Enabled | Docs backend only |
-| Disabled | Disabled | Inform user to run `/devflow:admin:setup` and STOP |
+| Disabled | Disabled | Inform user to run `/devflow-setup` and STOP |
 
 ---
 
@@ -115,11 +115,11 @@ For EVERY parameter on EVERY call, verify where the value came from:
 
 **`--rag` flag?**
 - If RAG_ENABLED: Go to RAG MEMORY
-- If not: "RAG Memory not configured. Run /devflow:admin:setup to enable." STOP
+- If not: "RAG Memory not configured. Run /devflow-setup to enable." STOP
 
 **`--docs` flag?**
 - If DOCS_ENABLED: Go to DOCS BACKEND (Confluence or Google Docs based on config)
-- If not: "No docs backend configured. Run /devflow:admin:setup to enable." STOP
+- If not: "No docs backend configured. Run /devflow-setup to enable." STOP
 
 **`--confluence` flag?**
 - Check Atlassian MCP availability

@@ -67,7 +67,7 @@ After bumping versions and pushing changes:
 
 4. **First-time backend configuration:**
    ```
-   /devflow:admin:setup
+   /devflow-setup
    ```
    This wizard configures your issue tracking (Jira/GitLab), documentation (Confluence/Google Docs/RAG Memory), and VCS (GitHub/GitLab) backends.
 
@@ -93,7 +93,7 @@ Then start a new Claude Code session and:
 /plugin marketplace add codingthefuturewithai/claude-code-primitives
 /plugin install devflow@claude-code-primitives
 /devflow:admin:setup-skills
-/devflow:admin:setup
+/devflow-setup
 ```
 
 ## File Organization Rules
@@ -135,7 +135,7 @@ Then start a new Claude Code session and:
 - `/devflow:build:workflow-guide` - Workflow overview
 
 ### Admin
-- `/devflow:admin:setup` - Configure backends (Jira/GitLab, Confluence/Google Docs, GitHub/GitLab)
+- `/devflow-setup` - Configure backends (Jira/GitLab, Confluence/Google Docs, GitHub/GitLab)
 - `/devflow:admin:setup-skills` - Create skill symlinks
 
 ### RAG Memory

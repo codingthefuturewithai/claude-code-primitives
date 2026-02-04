@@ -20,7 +20,7 @@ Load DevFlow configuration to determine backends and extract parameters.
 
 1. Check `.claude/devflow-config.md` (project-level)
 2. Check `~/.claude/devflow-config.md` (global-level)
-3. If neither exists → STOP. Say: "No DevFlow config found. Run `/devflow:admin:setup` to configure backends."
+3. If neither exists → STOP. Say: "No DevFlow config found. Run `/devflow-setup` to configure backends."
 
 **Step 2: Parse config and extract values**
 

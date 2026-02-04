@@ -69,6 +69,6 @@ Current DevFlow documentation options:
 
 To use DevFlow without external documentation:
 ```
-/devflow:admin:setup
+/devflow-setup
 ```
 And skip the documentation option, or use RAG Memory only.

@@ -77,6 +77,6 @@ Current DevFlow requires either:
 
 To use DevFlow without external issue tracking, run:
 ```
-/devflow:admin:setup
+/devflow-setup
 ```
 And select "Skip issue tracking" option.

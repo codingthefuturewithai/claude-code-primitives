@@ -23,7 +23,7 @@ https://docs.google.com/document/d/[DOCUMENT_ID]/edit
 Read devflow-config.md → Extract google_email value → Pass as user_google_email
 ```
 
-**NEVER** guess or infer the Google email from other context (Atlassian, GitLab, etc.). The user explicitly chose this email during `/devflow:admin:setup`.
+**NEVER** guess or infer the Google email from other context (Atlassian, GitLab, etc.). The user explicitly chose this email during `/devflow-setup`.
 
 ---
 
