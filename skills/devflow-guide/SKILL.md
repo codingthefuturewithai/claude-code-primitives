@@ -5,8 +5,8 @@ argument-hint: "[build|pm|docs|rag-memory|devops|hooks|agents|all]"
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:
+  - Bash
   - Read
-  - Glob
 ---
 
 # DevFlow Plugin Guide
@@ -17,89 +17,46 @@ allowed-tools:
 
 ---
 
-## Step 1: Find the Plugin
+## Step 1: Run Discovery Script
 
-Search for the plugin directory:
+Execute the discovery script to find all plugin primitives:
 
-1. Use Glob with pattern `~/.claude/plugins/cache/claude-code-primitives/devflow/*/skills/*/SKILL.md`
-2. If no results, try `plugins/devflow/skills/*/SKILL.md` (source repo)
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/skills/devflow-guide/scripts/discover.py"
+```
 
-The plugin contains these primitive types:
-- **Skills** - Workflows invoked with `/name`
-- **Sub-agents** - Skills that run in isolated context (`context: fork`)
-- **Hooks** - Approval scripts that run before tool calls
-- **Commands** - Traditional slash commands (if any exist)
-
----
-
-## Step 2: Discover Skills and Sub-agents
-
-For each SKILL.md found:
-
-1. Read the first 20 lines to extract YAML frontmatter
-2. Parse these fields:
-   - `name:` - The slash command
-   - `description:` - What it does
-   - `context:` - If "fork", this is a sub-agent
-   - `agent:` - The agent type (Explore, Plan, etc.)
-   - `disable-model-invocation:` - If true, user-only invocation
-
-3. Categorize by directory name prefix:
-   - `build-*` → Build (development workflow)
-   - `pm-*` → PM (project management)
-   - `docs-*` → Docs (documentation)
-   - `rag-memory-*` → RAG Memory (knowledge base)
-   - `devops-*` → DevOps
-   - Others → Core (setup, utilities)
-
-4. Flag skills with `context: fork` as **Sub-agents**
+The script outputs JSON containing:
+- `skills` - All skills with name, description, category, and sub-agent status
+- `hooks` - All hook scripts and what they protect
+- `commands` - Traditional commands (if any)
+- `by_category` - Skills grouped by category
+- `summary` - Counts of each primitive type
 
 ---
 
-## Step 3: Discover Hooks
+## Step 2: Filter by Argument
 
-Use Glob to find hook scripts:
-- Pattern: `~/.claude/plugins/cache/claude-code-primitives/devflow/*/hooks/*.py`
-- Or: `plugins/devflow/hooks/*.py`
+Based on $ARGUMENTS, filter the results:
 
-For each `.py` file found, note its purpose:
-- `atlassian-approval.py` → Protects Jira and Confluence
-- `gitlab-approval.py` → Protects GitLab issues and MRs
-- `google-workspace-approval.py` → Protects Google Docs/Drive
-- `rag-memory-approval.py` → Protects RAG Memory
-
----
-
-## Step 4: Discover Commands (if any)
-
-Check for a commands directory:
-- Pattern: `~/.claude/plugins/cache/claude-code-primitives/devflow/*/commands/*.md`
-- Or: `plugins/devflow/commands/*.md`
-
-If found, read frontmatter from each. If none exist, note "No traditional commands - plugin uses skills."
+| Argument | Action |
+|----------|--------|
+| (empty) or "all" | Show everything |
+| "build" | Show only `by_category.build` skills |
+| "pm" | Show only `by_category.pm` skills |
+| "docs" | Show only `by_category.docs` skills |
+| "rag-memory" | Show only `by_category.rag-memory` skills |
+| "devops" | Show only `by_category.devops` skills |
+| "core" | Show only `by_category.core` skills |
+| "hooks" | Show only hooks |
+| "agents" | Show only skills where `is_subagent` is true |
 
 ---
 
-## Step 5: Filter by Argument
+## Step 3: Present Results
 
-| Argument | Show |
-|----------|------|
-| (empty) or "all" | Everything |
-| "build" | Build category skills |
-| "pm" | PM category skills |
-| "docs" | Docs category skills |
-| "rag-memory" | RAG Memory skills |
-| "devops" | DevOps skills |
-| "hooks" | Only hooks |
-| "agents" | Only sub-agents (context: fork) |
+Format the JSON output as readable markdown tables:
 
----
-
-## Step 6: Present Results
-
-### Skills
-
-For each category with skills:
+### For Skills (by category):
 
 **[Category] Skills ([count])**
 
@@ -107,36 +64,33 @@ For each category with skills:
 |-------|-------------|
 | `/[name]` | [description] |
 
-### Sub-agents
+### For Sub-agents:
+
+**Sub-agents ([count])**
 
 Skills that run in isolated context:
 
 | Sub-agent | Agent Type | Description |
 |-----------|------------|-------------|
-| `/[name]` | [agent type] | [description] |
+| `/[name]` | [agent_type] | [description] |
 
-### Hooks
+### For Hooks:
+
+**Hooks ([count] active)**
 
 | Hook | Protects |
 |------|----------|
-| [filename] | [systems protected] |
-
-### Commands
-
-If any traditional commands exist, list them. Otherwise: "No traditional commands."
+| [name] | [protects] |
 
 ---
 
-## Step 7: Summary
+## Step 4: Summary
 
-**Total:** [X] skills ([Y] sub-agents), [Z] hooks
+End with:
 
-**Primitives overview:**
-- Skills: Workflows you invoke with `/name`
-- Sub-agents: Skills that run in isolated context for exploration/planning
-- Hooks: Approval prompts before modifying external systems
+**Total:** [summary.total_skills] skills ([summary.subagents] sub-agents), [summary.hooks] hooks
 
 **Quick start:**
-- `/devflow-setup` - Configure backends
-- `/devflow:build:workflow-guide` - Development workflow overview
+- `/devflow-setup` - Configure your backends
+- `/devflow:build:workflow-guide` - Learn the development workflow
 - `/devflow:build:fetch-issue [KEY]` - Start working on an issue
