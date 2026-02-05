@@ -241,31 +241,42 @@ backend: [github/gitlab]
 
 Say: "DevFlow configured! Your backends are ready."
 
-### Discover Available Commands
+### Discover Available Skills
 
-1. Use Glob to find all `.md` files under `.claude/commands/`:
-   - Pattern: `.claude/commands/**/*.md`
-   - **Exclude** `commands-guide.md` and any files inside `reference/` or `references/` subdirectories
+1. Find the installed plugin location:
+   ```bash
+   # Find plugin cache path
+   find ~/.claude/plugins/cache/claude-code-primitives -name "devflow" -type d 2>/dev/null | head -1
+   ```
+   Or if in source repo: `plugins/devflow`
 
-2. For each file found, read the first 10 lines to extract the `description` field from the YAML frontmatter.
+2. List all skills in the plugin's `skills/` directory:
+   ```bash
+   ls "$PLUGIN_PATH/skills/"
+   ```
 
-3. Derive the slash command name from the file path:
-   - `.claude/commands/<category>/<name>.md` → `/devflow:<category>:<name>`
-   - `.claude/commands/<name>.md` → `/devflow:<name>`
+3. For each skill, follow the symlink and read `SKILL.md` to extract:
+   - **name** from frontmatter
+   - **description** from frontmatter
 
-4. Group commands by category and present a concise summary:
+4. Group skills by category prefix (build, pm, docs, rag-memory, devops) and present:
 
 ```
-**Available commands:**
+## Available Skills
 
-## <Category> (<count> commands)
-| Command | Description |
-|---------|-------------|
-| `/devflow:<category>:<name>` | description from frontmatter |
+### Build ([count] skills)
+| Skill | Description |
+|-------|-------------|
+| `/devflow:build:fetch-issue` | description |
+
+### PM ([count] skills)
+...
 ```
 
 5. End with:
 
 > **Reconfigure anytime:** `/devflow-setup`
+>
+> **Full guide:** `/devflow:guide` to see all skills, hooks, and usage
 >
 > **If you enabled RAG Memory:** Run `/devflow:rag-memory:setup-collections` to create recommended collections
