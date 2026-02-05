@@ -1,7 +1,7 @@
 ---
 name: devflow:guide
-description: Discover all DevFlow plugin components - skills, hooks, and commands with descriptions and usage instructions
-argument-hint: "[build|pm|docs|rag-memory|devops|hooks]"
+description: Discover all DevFlow plugin primitives - skills, sub-agents, hooks, and commands with descriptions and usage
+argument-hint: "[build|pm|docs|rag-memory|devops|hooks|agents|all]"
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:
@@ -11,37 +11,48 @@ allowed-tools:
 
 # DevFlow Plugin Guide
 
+**Say exactly:** "SKILL INVOKED: devflow:guide"
+
 **Request:** $ARGUMENTS
 
-Say: "SKILL INVOKED: devflow:guide"
+---
+
+## Step 1: Find the Plugin
+
+Search for the plugin directory:
+
+1. Use Glob with pattern `~/.claude/plugins/cache/claude-code-primitives/devflow/*/skills/*/SKILL.md`
+2. If no results, try `plugins/devflow/skills/*/SKILL.md` (source repo)
+
+The plugin contains these primitive types:
+- **Skills** - Workflows invoked with `/name`
+- **Sub-agents** - Skills that run in isolated context (`context: fork`)
+- **Hooks** - Approval scripts that run before tool calls
+- **Commands** - Traditional slash commands (if any exist)
 
 ---
 
-## Step 1: Locate Plugin Skills
+## Step 2: Discover Skills and Sub-agents
 
-Use Glob to find all SKILL.md files in the plugin:
+For each SKILL.md found:
 
-1. First check the plugin cache:
-   - Pattern: `~/.claude/plugins/cache/claude-code-primitives/devflow/*/skills/*/SKILL.md`
+1. Read the first 20 lines to extract YAML frontmatter
+2. Parse these fields:
+   - `name:` - The slash command
+   - `description:` - What it does
+   - `context:` - If "fork", this is a sub-agent
+   - `agent:` - The agent type (Explore, Plan, etc.)
+   - `disable-model-invocation:` - If true, user-only invocation
 
-2. If that fails, check if in source repo:
-   - Pattern: `plugins/devflow/skills/*/SKILL.md`
+3. Categorize by directory name prefix:
+   - `build-*` → Build (development workflow)
+   - `pm-*` → PM (project management)
+   - `docs-*` → Docs (documentation)
+   - `rag-memory-*` → RAG Memory (knowledge base)
+   - `devops-*` → DevOps
+   - Others → Core (setup, utilities)
 
----
-
-## Step 2: Read Each Skill
-
-For each SKILL.md found, read the first 15 lines to extract from YAML frontmatter:
-- **name** - The slash command (e.g., `devflow:build:fetch-issue`)
-- **description** - What it does
-
-Parse the category from the skill directory name:
-- `build-*` → Build category
-- `pm-*` → PM category
-- `docs-*` → Docs category
-- `rag-memory-*` → RAG Memory category
-- `devops-*` → DevOps category
-- Others → Core category
+4. Flag skills with `context: fork` as **Sub-agents**
 
 ---
 
@@ -51,68 +62,81 @@ Use Glob to find hook scripts:
 - Pattern: `~/.claude/plugins/cache/claude-code-primitives/devflow/*/hooks/*.py`
 - Or: `plugins/devflow/hooks/*.py`
 
-List each hook file found. Known hooks and what they protect:
-- `atlassian-approval.py` → Jira and Confluence
-- `gitlab-approval.py` → GitLab issues and MRs
-- `google-workspace-approval.py` → Google Docs and Drive
-- `rag-memory-approval.py` → RAG Memory operations
+For each `.py` file found, note its purpose:
+- `atlassian-approval.py` → Protects Jira and Confluence
+- `gitlab-approval.py` → Protects GitLab issues and MRs
+- `google-workspace-approval.py` → Protects Google Docs/Drive
+- `rag-memory-approval.py` → Protects RAG Memory
 
 ---
 
-## Step 4: Handle Arguments
+## Step 4: Discover Commands (if any)
 
-**If $ARGUMENTS is empty or "all":**
-Show ALL skills organized by category, then hooks.
+Check for a commands directory:
+- Pattern: `~/.claude/plugins/cache/claude-code-primitives/devflow/*/commands/*.md`
+- Or: `plugins/devflow/commands/*.md`
 
-**If $ARGUMENTS matches a category (build, pm, docs, rag-memory, devops):**
-Show only skills in that category.
-
-**If $ARGUMENTS is "hooks":**
-Show only hooks.
+If found, read frontmatter from each. If none exist, note "No traditional commands - plugin uses skills."
 
 ---
 
-## Step 5: Present Results
+## Step 5: Filter by Argument
 
-Format output as:
+| Argument | Show |
+|----------|------|
+| (empty) or "all" | Everything |
+| "build" | Build category skills |
+| "pm" | PM category skills |
+| "docs" | Docs category skills |
+| "rag-memory" | RAG Memory skills |
+| "devops" | DevOps skills |
+| "hooks" | Only hooks |
+| "agents" | Only sub-agents (context: fork) |
 
-```
-## DevFlow Plugin Guide
+---
 
-### Build Skills ([count])
+## Step 6: Present Results
+
+### Skills
+
+For each category with skills:
+
+**[Category] Skills ([count])**
+
 | Skill | Description |
 |-------|-------------|
-| `/devflow:build:fetch-issue` | Fetch issue and analyze feasibility |
-...
+| `/[name]` | [description] |
 
-### PM Skills ([count])
-...
+### Sub-agents
 
-### Hooks ([count] active)
+Skills that run in isolated context:
+
+| Sub-agent | Agent Type | Description |
+|-----------|------------|-------------|
+| `/[name]` | [agent type] | [description] |
+
+### Hooks
+
 | Hook | Protects |
 |------|----------|
-| atlassian-approval.py | Jira/Confluence operations |
-...
+| [filename] | [systems protected] |
 
----
-**Total:** X skills, Y hooks
+### Commands
 
-**Quick start:** `/devflow-setup` to configure backends
-**Full workflow:** `/devflow:build:workflow-guide`
-```
+If any traditional commands exist, list them. Otherwise: "No traditional commands."
 
 ---
 
-## Rules
+## Step 7: Summary
 
-**Always:**
-- Use Glob to find actual files (don't assume)
-- Read frontmatter from each SKILL.md
-- Report only what exists
-- Group by category based on directory name prefix
+**Total:** [X] skills ([Y] sub-agents), [Z] hooks
 
-**Never:**
-- Hardcode skill lists
-- Use complex bash commands
-- Assume structure without checking
-- Report non-existent components
+**Primitives overview:**
+- Skills: Workflows you invoke with `/name`
+- Sub-agents: Skills that run in isolated context for exploration/planning
+- Hooks: Approval prompts before modifying external systems
+
+**Quick start:**
+- `/devflow-setup` - Configure backends
+- `/devflow:build:workflow-guide` - Development workflow overview
+- `/devflow:build:fetch-issue [KEY]` - Start working on an issue
