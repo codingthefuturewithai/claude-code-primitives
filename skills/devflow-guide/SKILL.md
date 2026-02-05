@@ -1,11 +1,10 @@
 ---
 name: devflow:guide
 description: Discover all DevFlow plugin components - skills, hooks, and commands with descriptions and usage instructions
-argument-hint: "[category]"
+argument-hint: "[build|pm|docs|rag-memory|devops|hooks]"
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:
-  - Bash
   - Read
   - Glob
 ---
@@ -14,254 +13,106 @@ allowed-tools:
 
 **Request:** $ARGUMENTS
 
----
-
-## Step 1: Locate the Plugin
-
-Find the installed DevFlow plugin location:
-
-```bash
-# Check for the plugin cache
-PLUGIN_PATH=$(find ~/.claude/plugins/cache/claude-code-primitives -name "devflow" -type d 2>/dev/null | head -1)
-echo "Plugin path: $PLUGIN_PATH"
-```
-
-If not found, check if we're in the source repo:
-```bash
-# Check if we're in the source repository
-if [ -d "plugins/devflow" ]; then
-  PLUGIN_PATH="plugins/devflow"
-fi
-```
+Say: "SKILL INVOKED: devflow:guide"
 
 ---
 
-## Step 2: Discover Skills
+## Step 1: Locate Plugin Skills
 
-Scan the plugin's `skills/` directory to find all available skills:
+Use Glob to find all SKILL.md files in the plugin:
 
-```bash
-# List all skill directories/symlinks
-ls -la "$PLUGIN_PATH/skills/" 2>/dev/null
-```
+1. First check the plugin cache:
+   - Pattern: `~/.claude/plugins/cache/claude-code-primitives/devflow/*/skills/*/SKILL.md`
 
-For each skill found, read its `SKILL.md` to extract:
-- **name** - The slash command name (from frontmatter)
-- **description** - What the skill does (from frontmatter)
-- **argument-hint** - Arguments it accepts (from frontmatter)
-- **user-invocable** - Whether user can invoke directly (from frontmatter)
-
-**Reading skill info:**
-```bash
-# For each skill directory, read SKILL.md
-head -20 "$PLUGIN_PATH/skills/<skill-name>/SKILL.md"
-```
-
-**Note:** Skills appear in the symlinked structure. Follow symlinks to read the actual SKILL.md files.
+2. If that fails, check if in source repo:
+   - Pattern: `plugins/devflow/skills/*/SKILL.md`
 
 ---
 
-## Step 3: Discover Commands (if any)
+## Step 2: Read Each Skill
 
-Check if the plugin has a `commands/` directory:
+For each SKILL.md found, read the first 15 lines to extract from YAML frontmatter:
+- **name** - The slash command (e.g., `devflow:build:fetch-issue`)
+- **description** - What it does
 
-```bash
-# Check for commands directory
-ls -la "$PLUGIN_PATH/commands/" 2>/dev/null
-```
-
-If commands exist, for each `.md` file, extract the same frontmatter fields.
-
-**Note:** If no commands directory exists or it's empty, report "No traditional commands - this plugin uses skills."
-
----
-
-## Step 4: Discover Hooks
-
-Check the plugin's `hooks/` directory:
-
-```bash
-# List hook files
-ls -la "$PLUGIN_PATH/hooks/" 2>/dev/null
-
-# Read hooks.json for configured hooks
-cat "$PLUGIN_PATH/hooks/hooks.json" 2>/dev/null
-```
-
-For each hook script (`.py` files), note its name and purpose.
-
-**Note:** Hooks embedded in skill frontmatter are automatically active when that skill runs.
+Parse the category from the skill directory name:
+- `build-*` → Build category
+- `pm-*` → PM category
+- `docs-*` → Docs category
+- `rag-memory-*` → RAG Memory category
+- `devops-*` → DevOps category
+- Others → Core category
 
 ---
 
-## Step 5: Handle Arguments
+## Step 3: Discover Hooks
 
-**If $ARGUMENTS is empty:**
-Show ALL components organized by type (Skills, Commands, Hooks).
+Use Glob to find hook scripts:
+- Pattern: `~/.claude/plugins/cache/claude-code-primitives/devflow/*/hooks/*.py`
+- Or: `plugins/devflow/hooks/*.py`
 
-**If $ARGUMENTS matches a category (e.g., "build", "pm", "docs"):**
-Show only skills/commands in that category.
+List each hook file found. Known hooks and what they protect:
+- `atlassian-approval.py` → Jira and Confluence
+- `gitlab-approval.py` → GitLab issues and MRs
+- `google-workspace-approval.py` → Google Docs and Drive
+- `rag-memory-approval.py` → RAG Memory operations
 
-**If $ARGUMENTS is "skills":**
-Show only skills.
+---
+
+## Step 4: Handle Arguments
+
+**If $ARGUMENTS is empty or "all":**
+Show ALL skills organized by category, then hooks.
+
+**If $ARGUMENTS matches a category (build, pm, docs, rag-memory, devops):**
+Show only skills in that category.
 
 **If $ARGUMENTS is "hooks":**
 Show only hooks.
 
-**If $ARGUMENTS is "commands":**
-Show only commands (or note if none exist).
-
 ---
 
-## Step 6: Present Results
+## Step 5: Present Results
 
-### Format for Skills:
+Format output as:
 
-```markdown
-## Skills ([count] available)
+```
+## DevFlow Plugin Guide
 
-### [Category] Skills
-
+### Build Skills ([count])
 | Skill | Description |
 |-------|-------------|
-| `/devflow:category:name` | Description from frontmatter |
+| `/devflow:build:fetch-issue` | Fetch issue and analyze feasibility |
+...
 
-**Usage:** `/devflow:category:name [arguments]`
-```
+### PM Skills ([count])
+...
 
-### Format for Commands (if any):
-
-```markdown
-## Commands ([count] available)
-
-| Command | Description |
-|---------|-------------|
-| `/devflow:command` | Description from frontmatter |
-```
-
-### Format for Hooks:
-
-```markdown
-## Hooks ([count] active)
-
-Hooks run automatically to protect external systems:
-
+### Hooks ([count] active)
 | Hook | Protects |
 |------|----------|
-| `atlassian-approval.py` | Jira and Confluence operations |
-| `gitlab-approval.py` | GitLab issues and MRs |
-| `google-workspace-approval.py` | Google Docs and Drive |
-| `rag-memory-approval.py` | RAG Memory operations |
-
-**Note:** Hooks prompt for approval before modifying external systems.
-```
+| atlassian-approval.py | Jira/Confluence operations |
+...
 
 ---
+**Total:** X skills, Y hooks
 
-## Step 7: Provide Summary
-
-At the end, provide:
-
-1. Total counts: X skills, Y commands, Z hooks
-2. Quick start tip based on what's available
-3. Configuration reminder: "Run `/devflow-setup` to configure backends"
+**Quick start:** `/devflow-setup` to configure backends
+**Full workflow:** `/devflow:build:workflow-guide`
+```
 
 ---
 
 ## Rules
 
 **Always:**
-- Scan the ACTUAL plugin directory structure
-- Read frontmatter from each skill/command file
-- Include any new components automatically discovered
-- Follow symlinks to read actual file contents
-- Report accurately what exists (don't invent components)
+- Use Glob to find actual files (don't assume)
+- Read frontmatter from each SKILL.md
+- Report only what exists
+- Group by category based on directory name prefix
 
 **Never:**
-- Hardcode lists of skills/commands/hooks
-- Assume what exists without checking
-- Skip components because they're not in a predefined list
-- Report components that don't exist in the plugin
-
----
-
-## Example Output
-
-```markdown
-# DevFlow Plugin Guide
-
-## Skills (18 available)
-
-### Build Skills (9)
-Development workflow - from issue fetch to PR completion
-
-| Skill | Description |
-|-------|-------------|
-| `/devflow:build:fetch-issue` | Fetch issue and analyze feasibility |
-| `/devflow:build:plan-work` | Analyze issue and develop implementation plan |
-| `/devflow:build:implement-plan` | Execute approved implementation plan |
-| `/devflow:build:create-issue` | Create issue with codebase analysis |
-| `/devflow:build:complete-issue` | Final validation, create PR/MR, mark done |
-| `/devflow:build:post-merge` | Sync with remote after merge and clean up |
-| `/devflow:build:security-review` | Security analysis of changes |
-| `/devflow:build:workflow-guide` | Workflow overview |
-| `/devflow:build-ops` | Backend operations (internal) |
-
-### PM Skills (2)
-Product management - roadmap and backlog
-
-| Skill | Description |
-|-------|-------------|
-| `/devflow:pm:roadmap` | Manage Confluence product roadmap |
-| `/devflow:pm:backlog` | Manage Jira backlog from roadmap |
-
-### Docs Skills (2)
-Documentation management
-
-| Skill | Description |
-|-------|-------------|
-| `/devflow:docs:documentation-audit` | Audit docs against source code |
-| `/devflow:docs:reference-audit` | Discover and sync project docs |
-
-### RAG Memory Skills (2)
-Knowledge base setup
-
-| Skill | Description |
-|-------|-------------|
-| `/devflow:rag-memory:setup-collections` | Scaffold RAG Memory collections |
-| `/devflow:rag-memory:create-agent-preferences` | Create agent preferences |
-
-### DevOps Skills (1)
-
-| Skill | Description |
-|-------|-------------|
-| `/devflow:devops:sync-claude-knowledge` | Sync Claude Code changelog |
-
-### Core Skills (3)
-
-| Skill | Description |
-|-------|-------------|
-| `/devflow-setup` | Configure backends |
-| `/devflow:guide` | This guide |
-| `/devflow:knowledge-management` | Route content to KB |
-| `/repo-explorer` | Analyze GitHub repositories |
-
-## Commands
-
-No traditional commands - this plugin uses skills.
-
-## Hooks (4 active)
-
-| Hook | Protects |
-|------|----------|
-| `atlassian-approval.py` | Jira/Confluence operations |
-| `gitlab-approval.py` | GitLab issues/MRs |
-| `google-workspace-approval.py` | Google Docs/Drive |
-| `rag-memory-approval.py` | RAG Memory operations |
-
----
-
-**Total: 18 skills, 0 commands, 4 hooks**
-
-**Quick start:** Run `/devflow-setup` to configure your backends, then use `/devflow:build:workflow-guide` to learn the development workflow.
-```
+- Hardcode skill lists
+- Use complex bash commands
+- Assume structure without checking
+- Report non-existent components
