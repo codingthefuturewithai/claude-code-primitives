@@ -74,7 +74,7 @@ Append new content to an existing document.
 
 ### Determine Location
 
-Based on devflow-config.md `docs.organization` setting:
+Based on plugin config `docs.organization` setting:
 
 **If "manual":**
 - Create document without specific folder

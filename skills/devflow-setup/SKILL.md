@@ -69,8 +69,7 @@ hooks:
 
 Check for an existing config file:
 
-1. Check `.claude/devflow-config.md` (project)
-2. Check `~/.claude/devflow-config.md` (global)
+1. Check `~/.claude/plugins/config/devflow/config.md`
 
 **If config exists**, tell the user:
 > "You have an existing DevFlow configuration. Would you like to:"
@@ -190,15 +189,19 @@ Version Control:
 
 Ask:
 > "Save this configuration?"
-> 1. Yes - Save to global config (~/.claude/)
-> 2. Yes - Save to project config (.claude/)
-> 3. No - Cancel setup
+> 1. Yes - Save configuration
+> 2. No - Cancel setup
 
 ---
 
 ## Step 6: Write Configuration
 
-Write to chosen location using this template:
+**First, create the config directory if it doesn't exist:**
+```bash
+mkdir -p ~/.claude/plugins/config/devflow
+```
+
+**Then write to `~/.claude/plugins/config/devflow/config.md`:**
 
 ```markdown
 # DevFlow Backend Configuration

@@ -72,9 +72,8 @@ DO NOT:
 Load DevFlow configuration to determine what's available.
 
 **Check for config file:**
-1. Check `.claude/devflow-config.md` (project)
-2. Check `~/.claude/devflow-config.md` (global)
-3. If no config → Default to checking both RAG Memory and Atlassian
+1. Check `~/.claude/plugins/config/devflow/config.md`
+2. If no config → Default to checking both RAG Memory and Atlassian
 
 **Parse configuration:**
 - `rag-memory.enabled` - Is RAG Memory available?
@@ -108,7 +107,7 @@ For EVERY parameter on EVERY call, verify where the value came from:
 
 | Source | Allowed? | Action |
 |--------|----------|--------|
-| Value from `devflow-config.md` read in Step 0 | **YES** | Use it |
+| Value from plugin config read in Step 0 | **YES** | Use it |
 | Value returned from a PREVIOUS call to the SAME backend's MCP server | **YES** | Use it |
 | Value provided by the user in this conversation | **YES** | Use it |
 | Value from a DIFFERENT backend's MCP server | **NO** | STOP. Backends are isolated. |

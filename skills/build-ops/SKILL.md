@@ -64,9 +64,8 @@ Load DevFlow configuration to determine backends and extract parameters.
 
 **Step 1: Find config file**
 
-1. Check `.claude/devflow-config.md` (project-level)
-2. Check `~/.claude/devflow-config.md` (global-level)
-3. If neither exists → STOP. Say: "No DevFlow config found. Run `/devflow-setup` to configure backends."
+1. Check `~/.claude/plugins/config/devflow/config.md`
+2. If not found → STOP. Say: "No DevFlow config found. Run `/devflow-setup` to configure backends."
 
 **Step 2: Parse config and extract values**
 
@@ -93,7 +92,7 @@ For EVERY parameter on EVERY call, verify where the value came from:
 
 | Source | Allowed? | Action |
 |--------|----------|--------|
-| Value read from `devflow-config.md` in this session | **YES** | Use it |
+| Value read from plugin config in this session | **YES** | Use it |
 | Value returned from a PREVIOUS call to the SAME backend's MCP server | **YES** | Use it |
 | Value provided by the user in this conversation | **YES** | Use it |
 | Value from a DIFFERENT backend's MCP server or CLI | **NO** | STOP. Backends are isolated. Say: "I cannot use [value] from [source backend] for [target backend]. These backends are completely independent." |
