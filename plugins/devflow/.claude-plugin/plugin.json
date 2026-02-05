@@ -1,6 +1,6 @@
 {
   "name": "devflow",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "AI-native development workflow: multi-backend support for Jira/GitLab/GitHub issues, Confluence/Google Docs, and GitHub/GitLab VCS",
   "author": {
     "name": "Coding the Future with AI",
