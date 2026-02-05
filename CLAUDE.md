@@ -59,19 +59,13 @@ After bumping versions and pushing changes:
    /plugin install devflow@claude-code-primitives
    ```
 
-3. **Setup skills (required for skills to work):**
-   ```
-   /devflow:admin:setup-skills
-   ```
-   This creates symlinks in `~/.claude/skills/` for the plugin's skills.
-
-4. **First-time backend configuration:**
+3. **First-time backend configuration:**
    ```
    /devflow-setup
    ```
    This wizard configures your issue tracking (Jira/GitLab), documentation (Confluence/Google Docs/RAG Memory), and VCS (GitHub/GitLab) backends.
 
-5. **Verify installation:**
+4. **Verify installation:**
    - Run a slash command like `/devflow:build:workflow-guide`
    - Check that your changes are reflected
 
@@ -92,7 +86,6 @@ Then start a new Claude Code session and:
 ```
 /plugin marketplace add codingthefuturewithai/claude-code-primitives
 /plugin install devflow@claude-code-primitives
-/devflow:admin:setup-skills
 /devflow-setup
 ```
 
@@ -136,7 +129,6 @@ Then start a new Claude Code session and:
 
 ### Admin
 - `/devflow-setup` - Configure backends (Jira/GitLab, Confluence/Google Docs, GitHub/GitLab)
-- `/devflow:admin:setup-skills` - Create skill symlinks
 
 ### RAG Memory
 - `/devflow:rag-memory:setup-collections` - Scaffold RAG Memory collections
