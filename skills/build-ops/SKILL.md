@@ -2,6 +2,52 @@
 name: devflow:build-ops
 description: Backend operations for issue tracking (Jira, GitLab, GitHub) and VCS (GitHub PRs, GitLab MRs). Handles config loading, parameter validation, and MCP tool calls for build workflow commands.
 user-invocable: false
+hooks:
+  PreToolUse:
+    - matcher: "mcp__gitlab__create_issue"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/gitlab-approval.py"
+    - matcher: "mcp__gitlab__update_issue"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/gitlab-approval.py"
+    - matcher: "mcp__gitlab__delete_issue"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/gitlab-approval.py"
+    - matcher: "mcp__gitlab__create_merge_request"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/gitlab-approval.py"
+    - matcher: "mcp__gitlab__update_merge_request"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/gitlab-approval.py"
+    - matcher: "mcp__gitlab__create_note"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/gitlab-approval.py"
+    - matcher: "mcp__atlassian__createJiraIssue"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+    - matcher: "mcp__atlassian__editJiraIssue"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+    - matcher: "mcp__atlassian__addCommentToJiraIssue"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+    - matcher: "mcp__atlassian__transitionJiraIssue"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+    - matcher: "mcp__atlassian__addWorklogToJiraIssue"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
 ---
 
 # Build Operations

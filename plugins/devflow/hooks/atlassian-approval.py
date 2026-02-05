@@ -1,0 +1,1 @@
+../../../hooks/atlassian-approval.py

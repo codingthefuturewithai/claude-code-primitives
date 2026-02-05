@@ -1,8 +1,55 @@
 ---
-name: devflow:setup
+name: devflow-setup
 description: Configure DevFlow backends for issue tracking, documentation, and VCS. Use this skill when the user wants to set up, configure, or reconfigure their DevFlow development workflow backends, or when another command/skill says to run setup.
 user-invocable: true
-allowed-tools: ["Read", "Write", "Bash", "AskUserQuestion", "mcp__atlassian__getAccessibleAtlassianResources", "mcp__gitlab__list_projects", "mcp__google-workspace__list_drive_items", "mcp__rag-memory__list_collections"]
+allowed-tools:
+  - Read
+  - Write
+  - Bash
+  - Glob
+  - AskUserQuestion
+  - mcp__atlassian__getAccessibleAtlassianResources
+  - mcp__gitlab__list_projects
+  - mcp__google-workspace__list_drive_items
+  - mcp__rag-memory__list_collections
+hooks:
+  PreToolUse:
+    - matcher: "mcp__google-workspace__create_doc"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/google-workspace-approval.py"
+    - matcher: "mcp__google-workspace__modify_doc_text"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/google-workspace-approval.py"
+    - matcher: "mcp__google-workspace__create_drive_file"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/google-workspace-approval.py"
+    - matcher: "mcp__google-workspace__update_drive_file"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/google-workspace-approval.py"
+    - matcher: "mcp__google-workspace__share_drive_file"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/google-workspace-approval.py"
+    - matcher: "mcp__atlassian__createConfluencePage"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+    - matcher: "mcp__atlassian__updateConfluencePage"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+    - matcher: "mcp__atlassian__createConfluenceFooterComment"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+    - matcher: "mcp__atlassian__createConfluenceInlineComment"
+      hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
 ---
 
 # DevFlow Setup
@@ -192,14 +239,33 @@ backend: [github/gitlab]
 
 ## Complete
 
-> "DevFlow configured! Your backends are ready."
->
-> **Available commands:**
-> - `/devflow:build:fetch-issue` - Fetch and analyze issues
-> - `/devflow:build:plan-work` - Create implementation plans
-> - `/devflow:build:implement-plan` - Execute plans
-> - `/devflow:build:complete-issue` - Create PR/MR and close issue
->
+Say: "DevFlow configured! Your backends are ready."
+
+### Discover Available Commands
+
+1. Use Glob to find all `.md` files under `.claude/commands/`:
+   - Pattern: `.claude/commands/**/*.md`
+   - **Exclude** `commands-guide.md` and any files inside `reference/` or `references/` subdirectories
+
+2. For each file found, read the first 10 lines to extract the `description` field from the YAML frontmatter.
+
+3. Derive the slash command name from the file path:
+   - `.claude/commands/<category>/<name>.md` → `/devflow:<category>:<name>`
+   - `.claude/commands/<name>.md` → `/devflow:<name>`
+
+4. Group commands by category and present a concise summary:
+
+```
+**Available commands:**
+
+## <Category> (<count> commands)
+| Command | Description |
+|---------|-------------|
+| `/devflow:<category>:<name>` | description from frontmatter |
+```
+
+5. End with:
+
 > **Reconfigure anytime:** `/devflow-setup`
 >
 > **If you enabled RAG Memory:** Run `/devflow:rag-memory:setup-collections` to create recommended collections

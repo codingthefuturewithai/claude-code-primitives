@@ -1,7 +1,9 @@
 ---
-name: primitives-toolkit:repo-explorer
+name: repo-explorer
 description: Explore and analyze GitHub repositories. Use this skill when the user asks to understand, explore, or analyze a codebase, repository structure, or code architecture.
 user-invocable: true
+context: fork
+agent: Explore
 ---
 
 # Repo Explorer Skill
