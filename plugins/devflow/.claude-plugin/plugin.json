@@ -1,7 +1,7 @@
 {
   "name": "devflow",
-  "version": "2.4.1",
-  "description": "AI-native development workflow: multi-backend support for Jira/GitLab/GitHub issues, Confluence/Google Docs, and GitHub/GitLab VCS",
+  "version": "2.5.0",
+  "description": "AI-native development workflow: multi-backend support for Jira/GitLab/GitHub issues, Confluence/Google Drive, and GitHub/GitLab VCS",
   "author": {
     "name": "Coding the Future with AI",
     "url": "https://github.com/codingthefuturewithai"
@@ -14,7 +14,7 @@
     "gitlab",
     "github",
     "confluence",
-    "google-docs",
+    "google-drive",
     "workflow",
     "multi-backend"
   ]

@@ -10,30 +10,18 @@ allowed-tools:
   - AskUserQuestion
   - mcp__atlassian__getAccessibleAtlassianResources
   - mcp__gitlab__list_projects
-  - mcp__google-workspace__list_drive_items
+  - mcp__google-drive__search_files
   - mcp__rag-memory__list_collections
 hooks:
   PreToolUse:
-    - matcher: "mcp__google-workspace__create_doc"
+    - matcher: "mcp__google-drive__upload_file"
       hooks:
         - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/google-workspace-approval.py"
-    - matcher: "mcp__google-workspace__modify_doc_text"
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/google-drive-approval.py"
+    - matcher: "mcp__google-drive__create_folder"
       hooks:
         - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/google-workspace-approval.py"
-    - matcher: "mcp__google-workspace__create_drive_file"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/google-workspace-approval.py"
-    - matcher: "mcp__google-workspace__update_drive_file"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/google-workspace-approval.py"
-    - matcher: "mcp__google-workspace__share_drive_file"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/google-workspace-approval.py"
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/google-drive-approval.py"
     - matcher: "mcp__atlassian__createConfluencePage"
       hooks:
         - type: command
@@ -105,7 +93,7 @@ Store results: `ISSUES_BACKEND`, `ISSUES_ENABLED`, `ATLASSIAN_VERIFIED` (bool), 
 Ask:
 > "Do you want documentation integration?"
 > 1. Yes - Confluence (Atlassian)
-> 2. Yes - Google Docs
+> 2. Yes - Google Drive
 > 3. No - Skip documentation
 
 Route based on selection:
@@ -113,7 +101,7 @@ Route based on selection:
   - If `ATLASSIAN_VERIFIED=true` from Step 1: "Atlassian MCP already connected. Confluence is available."
     Ask for optional `default_space`, then continue.
   - If NOT verified → follow [references/docs-confluence.md](references/docs-confluence.md)
-- **Google Docs** → follow [references/docs-google-workspace.md](references/docs-google-workspace.md)
+- **Google Drive** → follow [references/docs-google-drive.md](references/docs-google-drive.md)
 - **Skip** → set `DOCS_BACKEND=none`, `DOCS_ENABLED=false`
 
 ---
@@ -135,7 +123,7 @@ Route based on selection:
 **If both docs AND RAG Memory enabled**, ask routing preference:
 > "You have both a docs backend and RAG Memory. How should content be routed?"
 > 1. Let me decide each time (default)
-> 2. Quick notes → RAG, formal docs → [Confluence/Google Docs]
+> 2. Quick notes → RAG, formal docs → [Confluence/Google Drive]
 > 3. Everything to RAG Memory
 
 ---
@@ -174,7 +162,7 @@ Issue Tracking:
   Status: [enabled/disabled]
 
 Documentation:
-  Backend: [confluence/google-docs/none]
+  Backend: [confluence/google-drive/none]
   Status: [enabled/disabled]
   Organization: [manual/default-folder/ask-each-time]
 
@@ -219,12 +207,10 @@ default_project: [if gitlab, optional]
 # Uses current repo context via gh CLI
 
 ## Documentation
-backend: [confluence/google-docs/none]
+backend: [confluence/google-drive/none]
 enabled: [true/false]
 organization: [manual/default-folder/ask-each-time]
-# For Google Docs:
-google_email: [user's Google email - ALWAYS pass this on Google Workspace calls]
-# For Google Docs with default-folder:
+# For Google Drive with default-folder:
 default_folder_id: [folder id]
 # For Confluence:
 default_space: [space key, optional]

@@ -130,7 +130,7 @@ def discover_hooks(plugin_path):
     hook_descriptions = {
         "atlassian-approval.py": "Jira and Confluence operations",
         "gitlab-approval.py": "GitLab issues and merge requests",
-        "google-workspace-approval.py": "Google Docs and Drive",
+        "google-drive-approval.py": "Google Drive operations",
         "rag-memory-approval.py": "RAG Memory operations",
     }
 

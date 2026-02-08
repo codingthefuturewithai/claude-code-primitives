@@ -1,0 +1,1 @@
+../../../hooks/google-drive-approval.py

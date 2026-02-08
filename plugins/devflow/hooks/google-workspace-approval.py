@@ -1,1 +1,0 @@
-../../../hooks/google-workspace-approval.py

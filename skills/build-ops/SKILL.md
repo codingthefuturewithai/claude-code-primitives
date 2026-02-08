@@ -78,7 +78,6 @@ Read the config file and extract ALL of the following:
 | VCS_BACKEND | `vcs.backend` | PR/MR operations (github, gitlab) |
 | CLOUD_ID | `cloudId` | Jira/Confluence calls |
 | DEFAULT_PROJECT | `default_project` | GitLab calls |
-| GOOGLE_EMAIL | `google_email` | Google Workspace calls |
 
 Store ALL extracted values for downstream use. Do NOT discard any.
 
@@ -106,7 +105,7 @@ Identifiers NEVER cross backend boundaries:
 - Atlassian IDs/emails → Atlassian calls ONLY
 - GitLab project IDs/user IDs → GitLab calls ONLY
 - GitHub repo/issue refs → GitHub calls ONLY
-- Google email/doc IDs → Google Workspace calls ONLY
+- Google Drive file/folder IDs → Google Drive calls ONLY
 - RAG Memory collection names → RAG Memory calls ONLY
 
 Content (titles, descriptions, text) CAN flow between backends. Identifiers CANNOT.
@@ -118,7 +117,6 @@ Content (titles, descriptions, text) CAN flow between backends. Identifiers CANN
 | cloudId | Config `cloudId` OR `getAccessibleAtlassianResources` response | Guess, infer, construct |
 | issueKey | User input `$ARGUMENTS` | Construct from other data |
 | project_id | Config `default_project` OR `list_projects` + user selection | Guess from repo name |
-| user_google_email | Config `google_email`. If missing, ASK user | Infer from Atlassian, GitLab, domain names |
 | transitionId | `getTransitionsForJiraIssue` response | Hardcode or guess |
 
 ---

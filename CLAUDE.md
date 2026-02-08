@@ -12,7 +12,7 @@ claude-code-primitives/
 │       │   └── plugin.json   # Plugin metadata (VERSION HERE - must match marketplace.json)
 │       ├── adapters/         # Backend adapter reference files
 │       │   ├── issues/       # Jira, GitLab, Local issue adapters
-│       │   ├── docs/         # Confluence, Google Docs, Local doc adapters
+│       │   ├── docs/         # Confluence, Google Drive, Local doc adapters
 │       │   ├── vcs/          # GitHub, GitLab VCS adapters
 │       │   └── setup/        # MCP server setup instructions
 │       ├── commands/         # Slash commands for the plugin
@@ -63,7 +63,7 @@ After bumping versions and pushing changes:
    ```
    /devflow-setup
    ```
-   This wizard configures your issue tracking (Jira/GitLab), documentation (Confluence/Google Docs/RAG Memory), and VCS (GitHub/GitLab) backends.
+   This wizard configures your issue tracking (Jira/GitLab), documentation (Confluence/Google Drive/RAG Memory), and VCS (GitHub/GitLab) backends.
 
 4. **Verify installation:**
    - Run a slash command like `/devflow:build:workflow-guide`
@@ -112,7 +112,7 @@ Then start a new Claude Code session and:
 | Component | Options |
 |-----------|---------|
 | Issues | Jira (Atlassian MCP), GitLab (GitLab MCP) |
-| Documentation | Confluence (Atlassian MCP), Google Docs (Google Workspace MCP), RAG Memory |
+| Documentation | Confluence (Atlassian MCP), Google Drive (Google Drive MCP), RAG Memory |
 | VCS | GitHub (gh CLI), GitLab (GitLab MCP) |
 
 ## Common Slash Commands
@@ -128,7 +128,7 @@ Then start a new Claude Code session and:
 - `/devflow:build:workflow-guide` - Workflow overview
 
 ### Admin
-- `/devflow-setup` - Configure backends (Jira/GitLab, Confluence/Google Docs, GitHub/GitLab)
+- `/devflow-setup` - Configure backends (Jira/GitLab, Confluence/Google Drive, GitHub/GitLab)
 
 ### RAG Memory
 - `/devflow:rag-memory:setup-collections` - Scaffold RAG Memory collections

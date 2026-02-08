@@ -1,6 +1,6 @@
 # Claude Code Primitives
 
-A comprehensive toolkit of reusable primitives for Claude Code that supercharges your AI-assisted development workflow. This plugin provides battle-tested skills and protective hooks that integrate seamlessly with Jira, GitLab, Confluence, Google Docs, and RAG Memory.
+A comprehensive toolkit of reusable primitives for Claude Code that supercharges your AI-assisted development workflow. This plugin provides battle-tested skills and protective hooks that integrate seamlessly with Jira, GitLab, Confluence, Google Drive, and RAG Memory.
 
 ## What This Plugin Offers
 
@@ -8,13 +8,13 @@ A comprehensive toolkit of reusable primitives for Claude Code that supercharges
 Complete issue-integrated development cycle from issue creation through PR/MR completion. Claude guides you through fetching issues, planning work, implementing code, and closing out issues with proper documentation.
 
 ### Knowledge Management
-Intelligent routing of content to RAG Memory or your docs backend (Confluence/Google Docs). Claude understands your content and helps you store it in the right place with proper organization.
+Intelligent routing of content to RAG Memory or your docs backend (Confluence/Google Drive). Claude understands your content and helps you store it in the right place with proper organization.
 
 ### Project Management
 Confluence-integrated roadmap and backlog management. Review ideas, refine thoughts, and keep your product planning organized.
 
 ### Protective Hooks
-Automatic approval prompts before any modifications to external systems. Prevents accidental changes to Jira, GitLab, Confluence, Google Docs, and RAG Memory.
+Automatic approval prompts before any modifications to external systems. Prevents accidental changes to Jira, GitLab, Confluence, Google Drive, and RAG Memory.
 
 ---
 
@@ -34,7 +34,7 @@ Automatic approval prompts before any modifications to external systems. Prevent
 ```
 /devflow-setup
 ```
-This wizard configures your issue tracking (Jira/GitLab/GitHub), documentation (Confluence/Google Docs), and VCS backends.
+This wizard configures your issue tracking (Jira/GitLab/GitHub), documentation (Confluence/Google Drive), and VCS backends.
 
 ### Step 4: Verify Installation
 ```
@@ -81,7 +81,7 @@ Hooks run automatically before certain actions to protect your data. Each skill 
 - Confluence: create/update pages, add comments
 - Jira: create/edit issues, add comments, transition status
 - GitLab: create/update issues, create MRs, add notes
-- Google Workspace: create/modify docs, create/update/share files
+- Google Drive: upload files, create folders
 
 ---
 
@@ -90,7 +90,7 @@ Hooks run automatically before certain actions to protect your data. Each skill 
 | Component | Options |
 |-----------|---------|
 | Issues | Jira (Atlassian MCP), GitLab (GitLab MCP), GitHub (gh CLI) |
-| Documentation | Confluence (Atlassian MCP), Google Docs (Google Workspace MCP) |
+| Documentation | Confluence (Atlassian MCP), Google Drive (Google Drive MCP) |
 | Knowledge Base | RAG Memory MCP |
 | VCS | GitHub (gh CLI), GitLab (GitLab MCP) |
 
@@ -106,7 +106,7 @@ Some features require MCP servers to be configured:
 | Jira integration | `atlassian` |
 | Confluence integration | `atlassian` |
 | GitLab integration | `gitlab` |
-| Google Docs integration | `google-workspace` |
+| Google Drive integration | `google-drive` |
 | Knowledge management | `rag-memory` |
 | Repo Explorer | `code-understanding` |
 

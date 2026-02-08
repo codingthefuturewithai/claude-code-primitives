@@ -78,15 +78,12 @@ Load DevFlow configuration to determine what's available.
 **Parse configuration:**
 - `rag-memory.enabled` - Is RAG Memory available?
 - `docs.enabled` - Is a docs backend enabled?
-- `docs.backend` - Which one? (confluence, google-docs)
+- `docs.backend` - Which one? (confluence, google-drive)
 - `rag-memory.routing` - How to route content (decide-each-time, quick-to-rag, all-to-rag)
-- `google_email` - User's Google email (CRITICAL for Google Workspace calls)
-
 Store:
 - RAG_ENABLED: true/false
 - DOCS_ENABLED: true/false
-- DOCS_BACKEND: confluence/google-docs/none
-- GOOGLE_EMAIL: value from config `google_email` (may be empty)
+- DOCS_BACKEND: confluence/google-drive/none
 
 **Availability check:**
 
@@ -113,11 +110,6 @@ For EVERY parameter on EVERY call, verify where the value came from:
 | Value from a DIFFERENT backend's MCP server | **NO** | STOP. Backends are isolated. |
 | Value that "looks right" or was inferred | **NO** | STOP. ASK the user. |
 
-### Google Workspace (CRITICAL)
-
-- `user_google_email`: ALWAYS read from config `google_email` (stored as GOOGLE_EMAIL in Step 0). NEVER infer from Atlassian, GitLab, or any other source.
-- If config has no `google_email` → ASK the user: "What is your Google email address?" Do NOT proceed without it.
-
 ### Confluence
 
 - `cloudId`: Read from config `cloudId` OR call `getAccessibleAtlassianResources`. NEVER fabricate.
@@ -134,9 +126,9 @@ For EVERY parameter on EVERY call, verify where the value came from:
 | Flag | Description |
 |------|-------------|
 | `--rag` | Route to RAG Memory only |
-| `--docs` | Route to configured docs backend (Confluence or Google Docs) |
+| `--docs` | Route to configured docs backend (Confluence or Google Drive) |
 | `--confluence` | Route to Confluence specifically (if available) |
-| `--google` | Route to Google Docs specifically (if available) |
+| `--google` | Route to Google Drive specifically (if available) |
 | `--both` | Search both, then decide |
 | `--update` | Force update of related existing document |
 | `--quick` | Force save as quick note (RAG only) |
@@ -151,7 +143,7 @@ For EVERY parameter on EVERY call, verify where the value came from:
 - If not: "RAG Memory not configured. Run /devflow-setup to enable." STOP
 
 **`--docs` flag?**
-- If DOCS_ENABLED: Go to DOCS BACKEND (Confluence or Google Docs based on config)
+- If DOCS_ENABLED: Go to DOCS BACKEND (Confluence or Google Drive based on config)
 - If not: "No docs backend configured. Run /devflow-setup to enable." STOP
 
 **`--confluence` flag?**
@@ -160,9 +152,9 @@ For EVERY parameter on EVERY call, verify where the value came from:
 - If not: "Confluence unavailable. Store in RAG Memory instead?" Wait for response.
 
 **`--google` flag?**
-- Check Google Workspace MCP availability
-- If available: Go to GOOGLE DOCS
-- If not: "Google Docs unavailable. Store in RAG Memory instead?" Wait for response.
+- Check Google Drive MCP availability
+- If available: Go to GOOGLE DRIVE
+- If not: "Google Drive unavailable. Store in RAG Memory instead?" Wait for response.
 
 **`--both` flag?** → Go to Step 2 (check what's available)
 
@@ -185,11 +177,12 @@ Test: `mcp__atlassian__getAccessibleAtlassianResources`
 - Success → Confluence available
 - Failure → Confluence unavailable
 
-**If DOCS_BACKEND = "google-docs":**
-Test: `mcp__google-workspace__list_drive_items` with:
-  - user_google_email: [FROM: GOOGLE_EMAIL (config `google_email`). If missing, ASK user and STOP.]
-- Success → Google Docs available
-- Failure → Google Docs unavailable
+**If DOCS_BACKEND = "google-drive":**
+Test: `mcp__google-drive__search_files` with:
+  - query: "test"
+  - max_results: 1
+- Success → Google Drive available
+- Failure → Google Drive unavailable
 
 **Route based on availability:**
 
@@ -207,7 +200,7 @@ Test: `mcp__google-workspace__list_drive_items` with:
 Ask user:
 > Where would you like to store this?
 > 1. RAG Memory
-> 2. [Confluence/Google Docs] (based on config)
+> 2. [Confluence/Google Drive] (based on config)
 > 3. Search both first, then decide
 > 4. Cancel
 
@@ -244,16 +237,15 @@ Summary:
 
 ---
 
-## GOOGLE DOCS
+## GOOGLE DRIVE
 
-Follow the workflow in [references/google-docs.md](references/google-docs.md).
+Follow the workflow in [references/google-drive.md](references/google-drive.md).
 
 Summary:
-1. Search for existing related documents
-2. Classify content (update existing vs new document)
-3. Route accordingly:
-   - **Update existing** → Append to related document
-   - **New document** → Create in configured location
+1. Search for existing related files on Google Drive
+2. Route user-provided content (local file, raw text) to Google Drive via upload
+3. For URLs, suggest RAG Memory (Google Drive MCP does not ingest URLs)
+4. For raw text with no file, write to temp `.md` then upload
 
 ---
 
@@ -265,10 +257,10 @@ Search both systems, then let user decide.
 2. **If DOCS_BACKEND = "confluence":**
    - Get Confluence spaces
    - Search: `search(query="[topic]")`
-3. **If DOCS_BACKEND = "google-docs":**
-   - Search: `mcp__google-workspace__search_docs(query="[topic]")`
+3. **If DOCS_BACKEND = "google-drive":**
+   - Search: `mcp__google-drive__search_files(query="[topic]")`
 4. Search RAG Memory: `search_documents(query="[topic]", limit=5)`
 5. Show results from both
-6. Ask: "Based on these results, where should I store this - RAG Memory or [Confluence/Google Docs]?"
+6. Ask: "Based on these results, where should I store this - RAG Memory or [Confluence/Google Drive]?"
 7. Route to chosen destination's workflow
 
