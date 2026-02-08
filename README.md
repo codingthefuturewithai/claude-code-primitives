@@ -98,11 +98,11 @@ Hooks run automatically before certain actions to protect your data. Each skill 
 
 ## Requirements
 
-### MCP Servers
-Some features require MCP servers to be configured:
+### MCP Servers (all optional)
+Each feature only requires its own MCP server — install only what you need:
 
-| Feature | Required MCP Server |
-|---------|---------------------|
+| Feature | MCP Server |
+|---------|------------|
 | Jira integration | `atlassian` |
 | Confluence integration | `atlassian` |
 | GitLab integration | `gitlab` |

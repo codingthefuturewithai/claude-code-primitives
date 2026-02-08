@@ -54,6 +54,30 @@ When calling `get_source_repo_map`:
 3. Validate URL is a GitHub URL (must start with `https://github.com/`)
 4. If user provided additional instructions beyond the URL, note them for guided exploration
 
+### Phase 0.5: MCP Detection
+
+Test that the Code Understanding MCP server is available:
+```
+Call mcp__code-understanding__list_cached_repository_branches with:
+  - url: "https://github.com/anthropics/anthropic-sdk-python"
+```
+
+**If successful** → Continue to Phase 1.
+
+**If failed (tool not found, connection error, etc.):**
+> "The Code Understanding MCP server (`code-understanding`) is not available.
+>
+> This skill requires the Code Understanding MCP server to explore repositories.
+>
+> **To set up:**
+> 1. Install and configure the `code-understanding` MCP server
+> 2. Add it to Claude Code with `claude mcp add`
+> 3. Restart Claude Code
+>
+> **Note:** This only affects the Repo Explorer skill — all other DevFlow skills work independently without it."
+
+STOP. Do not proceed.
+
 ### Phase 1: Repository Setup
 
 1. Load the Code Understanding MCP tools using MCPSearch:
