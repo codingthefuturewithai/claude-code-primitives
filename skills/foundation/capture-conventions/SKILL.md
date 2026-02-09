@@ -68,6 +68,7 @@ Guided interview to capture your team's conventions and store them centrally. Th
 - **Human gates** — confirm each section before moving to the next
 - **Never guess** — if something is ambiguous, ask
 - **Re-runnable** — if conventions already exist, load them and let the user update specific sections
+- **Triggers, not mandates** — present topics as "does your team do this?" not "you should do this"
 
 ---
 
@@ -180,7 +181,25 @@ Confirm section.
 
 ---
 
-## Step 4: Testing Conventions
+## Step 4: Code Quality & Refactoring
+
+Frame as: "Let's talk about code quality expectations — these are triggers for thinking, not hard rules."
+
+Ask about:
+- **File/module size guidance** — do you have a target max? (e.g., ~300 lines, no limit, "use judgment")
+- **Function/method length** — preferred max? (e.g., ~30 lines, no limit, "fits on one screen")
+- **DRY threshold** — when to extract vs duplicate? (e.g., "rule of three", "never duplicate", "use judgment")
+- **Dead code policy** — delete immediately, comment out, keep behind feature flags?
+- **Refactoring triggers** — what prompts a refactoring pass? (e.g., before adding features to messy code, during PR review, scheduled refactoring sprints, opportunistic)
+- **Complexity awareness** — does the team track or discuss cyclomatic complexity, cognitive complexity, or similar metrics? (e.g., "we use SonarQube", "informal awareness", "not something we track")
+
+See [references/interview-guide.md](references/interview-guide.md) for the full question bank.
+
+Confirm section.
+
+---
+
+## Step 5: Testing Conventions
 
 Ask about:
 - **Test framework** per stack (based on languages from Step 2)
@@ -194,7 +213,25 @@ Confirm section.
 
 ---
 
-## Step 5: Git & Workflow
+## Step 6: Documentation Standards
+
+Frame as: "What does your team expect when it comes to documentation?"
+
+Ask about:
+- **README expectations** — what should every repo's README contain? (e.g., setup instructions, architecture overview, minimal, comprehensive)
+- **API documentation** — do you use a spec format? (e.g., OpenAPI/Swagger, GraphQL schema, AsyncAPI, no formal spec, auto-generated)
+- **Architecture Decision Records (ADRs)** — does the team write ADRs? (e.g., yes with a template, informal design docs, no)
+- **Changelog** — how do you track changes? (e.g., CHANGELOG.md, auto-generated from commits, release notes only, none)
+- **Code comments** — expectations? (e.g., only non-obvious logic, JSDoc/docstrings for public APIs, minimal, comprehensive)
+- **Runbook/operational docs** — do you maintain them? (e.g., yes in wiki, yes in repo, ad hoc, no)
+
+See [references/interview-guide.md](references/interview-guide.md) for the full question bank.
+
+Confirm section.
+
+---
+
+## Step 7: Git & Workflow
 
 Ask about:
 - **Branching strategy** — trunk-based, GitFlow, GitHub Flow
@@ -207,7 +244,7 @@ Confirm section.
 
 ---
 
-## Step 6: Architecture Preferences
+## Step 8: Architecture Preferences
 
 Ask about:
 - **Monorepo vs polyrepo**
@@ -221,7 +258,43 @@ Confirm section.
 
 ---
 
-## Step 7: Preferred Libraries
+## Step 9: Security Practices
+
+Frame as: "Let's capture what your team does around security — every team is different, so I'll ask rather than assume."
+
+Ask about:
+- **Dependency scanning** — do you scan dependencies for vulnerabilities? (e.g., Snyk, Dependabot alerts, npm audit, pip-audit, GitHub security advisories, no formal process)
+- **Input validation** — where does the team validate? (e.g., at API boundaries only, every layer, schema-driven with Zod/Pydantic, ad hoc)
+- **Secrets management** — how are secrets handled? (e.g., dotenv with .gitignore, Vault/SSM/Secret Manager, CI/CD env vars, encrypted config)
+- **Authentication patterns** — any team-wide auth patterns? (e.g., JWT with refresh tokens, session-based, OAuth2 flows, delegated to auth service)
+- **Security review triggers** — when does a change get extra security scrutiny? (e.g., any auth changes, new API endpoints, dependency updates, never formally, all PRs)
+- **OWASP/security awareness** — does the team reference OWASP Top 10 or similar? (e.g., active training, awareness but informal, not really)
+
+See [references/interview-guide.md](references/interview-guide.md) for the full question bank.
+
+Confirm section.
+
+---
+
+## Step 10: Definition of Done
+
+Frame as: "What does 'done' mean on your team? This helps Claude understand when work is truly complete."
+
+Ask about:
+- **Code complete criteria** — what must be true before code is considered done? (e.g., tests pass, linting clean, types check, builds successfully)
+- **Testing requirements** — what testing is required? (e.g., unit tests for new logic, integration tests for new endpoints, E2E for user-facing changes, coverage threshold met)
+- **Documentation updates** — what docs must be updated? (e.g., README if behavior changes, API docs if endpoints change, changelog entry, ADR for architectural decisions, none required)
+- **Review requirements** — what review is needed? (e.g., 1 approval, 2 approvals, specific reviewer for certain areas, CODEOWNERS)
+- **Security check** — is a security scan part of done? (e.g., CI security scan passes, manual review for auth changes, Claude Code's built-in scanner, no formal requirement)
+- **Deployment readiness** — any deployment-related requirements? (e.g., feature flag wrapped, backwards compatible, migration tested, monitoring/alerts configured)
+
+See [references/interview-guide.md](references/interview-guide.md) for the full question bank.
+
+Confirm section.
+
+---
+
+## Step 11: Preferred Libraries
 
 Only ask about cross-cutting concerns relevant to the team's stack. See [references/interview-guide.md](references/interview-guide.md) for the full question bank.
 
@@ -229,7 +302,7 @@ Confirm section.
 
 ---
 
-## Step 8: Review & Store
+## Step 12: Review & Store
 
 ### Generate the Document
 
@@ -253,12 +326,28 @@ Domain: {primary domains, comma-separated}
 - Linter: {answer}
 ...
 
+## Code Quality & Refactoring
+- File size guidance: {answer}
+- Function length: {answer}
+- DRY threshold: {answer}
+- Dead code policy: {answer}
+- Refactoring triggers: {answer}
+- Complexity awareness: {answer}
+
 ## Testing
 - Framework: {answer per stack}
 - Coverage: {answer}
 ...
 
-## Git Workflow
+## Documentation Standards
+- README expectations: {answer}
+- API documentation: {answer}
+- ADRs: {answer}
+- Changelog: {answer}
+- Code comments: {answer}
+- Runbooks: {answer}
+
+## Git & Workflow
 - Branching: {answer}
 - Branch naming: {answer}
 ...
@@ -266,6 +355,22 @@ Domain: {primary domains, comma-separated}
 ## Architecture
 - Pattern: {answer}
 ...
+
+## Security Practices
+- Dependency scanning: {answer}
+- Input validation: {answer}
+- Secrets management: {answer}
+- Auth patterns: {answer}
+- Security review triggers: {answer}
+- Security awareness: {answer}
+
+## Definition of Done
+- Code complete: {answer}
+- Testing: {answer}
+- Documentation: {answer}
+- Review: {answer}
+- Security: {answer}
+- Deployment readiness: {answer}
 
 ## Preferred Libraries
 - {concern}: {library}

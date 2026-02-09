@@ -98,6 +98,23 @@ Reference for the capture-conventions skill. Contains the full question bank org
 
 ---
 
+## Code Quality & Refactoring Questions
+
+Frame these as "triggers for thinking" — not every team tracks these formally, and that's fine.
+
+| Topic | Question | Common Options |
+|-------|----------|---------------|
+| File size | Do you have file/module size guidance? | ~300 lines target, ~500 lines max, no formal limit, "use judgment" |
+| Function length | Preferred function/method length? | ~30 lines, "fits on one screen", no limit, "use judgment" |
+| DRY threshold | When do you extract shared code? | Rule of three, never duplicate, extract early, use judgment per case |
+| Dead code | How do you handle dead code? | Delete immediately, comment out with ticket, keep behind feature flag, no formal policy |
+| Refactoring triggers | What triggers a refactoring pass? | Before adding features to messy code, during PR review, scheduled sprints, opportunistic, tech debt tickets |
+| Complexity metrics | Do you track code complexity? | SonarQube/SonarCloud, CodeClimate, ESLint complexity rule, informal awareness, not tracked |
+| Code smells | Any specific code smells the team watches for? | Long parameter lists, deeply nested logic, god classes, feature envy, no formal list |
+| Tech debt tracking | How do you track tech debt? | Dedicated tickets/issues, TODO comments, tech debt register, informal, not tracked |
+
+---
+
 ## Coding Standards Questions
 
 | Topic | Question | Notes |
@@ -112,6 +129,25 @@ Reference for the capture-conventions skill. Contains the full question bank org
 | Imports | Import organization? | Auto-sorted, grouped (stdlib/external/internal), manual |
 | Error handling | Error handling philosophy? | Result/Either types, exceptions with specific patterns, error codes |
 | Comments | Comment expectations? | Only non-obvious logic, JSDoc/docstrings for public API, minimal |
+
+---
+
+## Documentation Standards Questions
+
+Frame as "what does your team expect?" — some teams document extensively, others keep it minimal.
+
+| Topic | Question | Common Options |
+|-------|----------|---------------|
+| README | What should every repo's README contain? | Setup instructions only, setup + architecture overview, comprehensive (setup + arch + API + contributing), minimal |
+| API docs | Do you use a formal API spec format? | OpenAPI/Swagger, GraphQL schema + playground, AsyncAPI, auto-generated from code, no formal spec |
+| API doc tooling | API documentation tooling? | Swagger UI, Redoc, Stoplight, Postman collections, none/manual |
+| ADRs | Does the team write Architecture Decision Records? | Yes with template (MADR, etc.), informal design docs, only for major decisions, no |
+| Changelog | How do you track changes for consumers? | CHANGELOG.md (Keep a Changelog), auto-generated from commits (conventional-changelog), release notes only, none |
+| Code comments | What are your expectations for code comments? | Only non-obvious logic, JSDoc/docstrings for public API, minimal (code should be self-documenting), comprehensive |
+| Inline docs | Do you use doc generation from code? | TypeDoc, Sphinx/autodoc, Godoc, Rustdoc, JSDoc site, no |
+| Runbooks | Do you maintain operational runbooks? | Yes in wiki (Confluence, Notion), yes in repo (docs/), ad hoc incident notes, no |
+| Onboarding | Is there a developer onboarding guide? | Yes comprehensive, yes basic setup guide, README covers it, no |
+| Diagrams | Do you maintain architecture diagrams? | Yes (Mermaid, draw.io, Excalidraw), yes but often stale, no |
 
 ---
 
@@ -156,6 +192,43 @@ Reference for the capture-conventions skill. Contains the full question bank org
 | Env management | Environment/secrets management? | dotenv, Vault, AWS SSM, GCP Secret Manager |
 | Dependencies | Dependency management? | Pin exact versions, allow ranges, automated updates (Dependabot/Renovate) |
 | API versioning | API versioning strategy? | URL path (/v1/), headers, no versioning |
+
+---
+
+## Security Practices Questions
+
+Frame as "what does your team do?" — every team has different security maturity, and that's okay.
+
+| Topic | Question | Common Options |
+|-------|----------|---------------|
+| Dependency scanning | Do you scan dependencies for vulnerabilities? | Snyk, Dependabot alerts, npm audit / pip-audit, GitHub security advisories, Trivy, no formal process |
+| Scan frequency | How often are dependency scans run? | Every PR (CI), nightly/weekly scheduled, manual/ad hoc, only when alerted |
+| Input validation | Where does the team validate input? | At API boundaries only, every layer, schema-driven (Zod/Pydantic/JSON Schema), ad hoc |
+| Secrets management | How are secrets handled in development? | dotenv with .gitignore, Vault/SSM/Secret Manager, CI/CD env vars, encrypted config (SOPS), 1Password/Doppler |
+| Secrets in CI | How are secrets managed in CI/CD? | CI/CD secrets store (GitHub Secrets, GitLab CI vars), Vault integration, env vars, encrypted files |
+| Auth patterns | Any team-wide authentication patterns? | JWT with refresh tokens, session-based, OAuth2 flows, delegated to auth service (Auth0, Clerk), API keys |
+| Security review | When does a change get extra security scrutiny? | Any auth/permission changes, new API endpoints, dependency updates, all PRs, never formally |
+| OWASP awareness | Does the team reference OWASP Top 10 or similar? | Active training/certification, awareness but informal, referenced during code review, not really |
+| Static analysis | Do you use security-focused static analysis? | Semgrep, CodeQL, Bandit (Python), ESLint security plugin, SonarQube security rules, no |
+| Container security | Do you scan container images? | Trivy, Snyk Container, AWS ECR scanning, no / not applicable |
+
+---
+
+## Definition of Done Questions
+
+Frame as "what does 'done' mean on your team?" — this captures the cross-cutting checklist.
+
+| Topic | Question | Common Options |
+|-------|----------|---------------|
+| Code complete | What must be true before code is "done"? | Tests pass, lint clean, types check, builds successfully, all of the above |
+| Test requirements | What testing is required for a change to be done? | Unit tests for new logic, integration tests for new endpoints, E2E for user-facing changes, coverage threshold met, depends on change type |
+| Doc updates | What documentation must be updated? | README if behavior changes, API docs if endpoints change, changelog entry, ADR for arch decisions, none required |
+| Review | What review is required? | 1 approval, 2 approvals, specific reviewer for certain areas, CODEOWNERS-based, architect sign-off for major changes |
+| Security scan | Is a security check part of "done"? | CI security scan passes, manual review for auth changes, Claude Code's security review, no formal requirement |
+| Deploy readiness | Any deployment-related requirements? | Feature flag wrapped, backwards compatible, migration tested, monitoring/alerts configured, rollback plan documented |
+| Accessibility | Are there accessibility requirements? | WCAG 2.1 AA compliance, basic a11y checks, screen reader testing, not applicable, no formal requirement |
+| Performance | Any performance requirements? | No regressions (benchmarks), load testing for new endpoints, Lighthouse score maintained, no formal requirement |
+| Cleanup | What cleanup is expected? | Remove debug code, clean up TODOs, remove unused imports, squash WIP commits, no formal checklist |
 
 ---
 
