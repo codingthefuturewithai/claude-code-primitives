@@ -131,18 +131,21 @@ Ask using AskUserQuestion:
 
 **Team/org name** — free text
 
-**Primary domains** (multiSelect):
+**Primary domains** — ask in two rounds to stay within the 4-option limit of AskUserQuestion:
+
+Round 1 (multiSelect):
 > "What types of projects does your team work on?"
-> - Web applications (frontend SPAs, SSR sites)
-> - Backend / API services (REST, GraphQL, gRPC, microservices)
+> - Web / Frontend (SPAs, SSR sites, static sites)
+> - Backend / API services (REST, GraphQL, microservices, CLI tools)
 > - Mobile apps (iOS, Android, cross-platform)
-> - Data / ML (pipelines, models, analytics)
-> - DevOps / Infrastructure (IaC, CI/CD, cloud)
-> - CLI tools / Developer tooling
-> - Desktop applications (Electron, Tauri, native)
+> - Data / ML / DevOps (pipelines, models, IaC, CI/CD)
+
+Round 2 (multiSelect):
+> "Any additional project types?"
 > - Libraries / SDKs (reusable packages, open source)
+> - Desktop applications (Electron, Tauri, native)
 > - Embedded / IoT
-> - Other (user specifies)
+> - None — that covers it
 
 Store selections — these determine which tech stack sections to ask about in Step 2.
 
