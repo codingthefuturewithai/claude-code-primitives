@@ -58,6 +58,44 @@ Reference for the capture-conventions skill. Contains the full question bank org
 | CI/CD | CI/CD platform? | GitHub Actions, GitLab CI, Jenkins, CircleCI, ArgoCD |
 | Monitoring | Monitoring/observability? | Datadog, Grafana, Prometheus, CloudWatch, New Relic |
 
+### CLI Tools / Developer Tooling
+
+| Topic | Question | Common Options |
+|-------|----------|---------------|
+| Language | Primary language? | Rust, Go, Python, TypeScript/Node, Bash |
+| CLI framework | CLI framework? | clap (Rust), cobra (Go), Click/Typer (Python), Commander (Node) |
+| Distribution | How is it distributed? | Homebrew, npm, pip, cargo, binary releases, Docker |
+| Config format | Config file format? | TOML, YAML, JSON, dotenv |
+
+### Desktop Applications
+
+| Topic | Question | Common Options |
+|-------|----------|---------------|
+| Framework | Desktop framework? | Electron, Tauri, SwiftUI, WPF/.NET, Qt, GTK |
+| Language | Primary language? | TypeScript, Rust, Swift, C#, C++, Python |
+| Packaging | How is it packaged? | DMG, MSI, AppImage, Snap, Flatpak, auto-updater |
+| Cross-platform | Cross-platform strategy? | Single codebase, platform-specific UI, web-based |
+
+### Libraries / SDKs
+
+| Topic | Question | Common Options |
+|-------|----------|---------------|
+| Language | Primary language? | TypeScript, Python, Rust, Go, Java, multi-language |
+| Package registry | Where is it published? | npm, PyPI, crates.io, Maven Central, NuGet |
+| API design | API design philosophy? | Minimal surface area, batteries-included, builder pattern |
+| Docs | Documentation approach? | README + API docs, docsite (Docusaurus/MkDocs), examples-first |
+| Versioning | Versioning strategy? | Strict semver, CalVer, 0.x until stable |
+| Backwards compat | Backwards compatibility policy? | Strict (no breaking changes), deprecation cycle, LTS branches |
+
+### Embedded / IoT
+
+| Topic | Question | Common Options |
+|-------|----------|---------------|
+| Language | Primary language? | C, C++, Rust, MicroPython, Arduino |
+| Platform | Target platform? | ESP32, STM32, Raspberry Pi, Arduino, custom RTOS |
+| Build system | Build system? | CMake, PlatformIO, Make, Cargo (embedded Rust) |
+| Communication | Communication protocol? | MQTT, HTTP, BLE, Zigbee, LoRa, custom serial |
+
 ---
 
 ## Coding Standards Questions

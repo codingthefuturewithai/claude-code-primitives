@@ -82,21 +82,30 @@ Guided interview to capture your team's conventions and store them centrally. Th
 - If `rag-memory.enabled=true` → RAG Memory is available
 - If neither → tell user: "No documentation backend configured. Run `/devflow-setup` to enable one." STOP.
 
-**Check for existing conventions:**
+**Check for existing conventions (search broadly — never assume location):**
+
+Search ALL configured backends for anything resembling team conventions. Do NOT assume a specific collection name, folder, or page title.
 
 If **RAG Memory** enabled:
-1. `search_documents(query="team conventions", collection_name="team-conventions")` — search for existing conventions doc
-2. If found → load it, go to **Update Flow** below
+1. `list_collections()` — see what collections exist
+2. `search_documents(query="team conventions tech stack coding standards workflow")` — search across ALL collections (no `collection_name` filter)
+3. If relevant results found → show user what was found, ask if this is their existing conventions doc
 
 If **Confluence** enabled:
-1. Search for existing page: `searchConfluenceUsingCql(cql="title = 'Team Conventions' AND type = 'page'")`
-2. If found → load it, go to **Update Flow**
+1. Search broadly: `searchConfluenceUsingCql(cql="text ~ 'team conventions' AND type = 'page'")` — or similar broad search
+2. If found → show results, ask user if any of these are their conventions
 
 If **Google Drive** enabled:
-1. `search_files(query="Team Conventions")`
-2. If found → load it, go to **Update Flow**
+1. `search_files(query="conventions")` and `search_files(query="coding standards")`
+2. If found → show results, ask user if any of these are their conventions
 
-If no existing conventions found → proceed to Step 1 (fresh interview).
+If nothing found in any backend:
+> "I didn't find existing team conventions in any of your configured backends. Would you like to:"
+> 1. Start fresh with the interview
+> 2. Point me to where your conventions are stored
+> 3. Cancel
+
+If user points to a location → load from there, go to **Update Flow**.
 
 ### Update Flow
 
@@ -124,12 +133,16 @@ Ask using AskUserQuestion:
 
 **Primary domains** (multiSelect):
 > "What types of projects does your team work on?"
-> - Web applications
-> - Backend / API services
-> - Mobile apps
-> - Data / ML
-> - DevOps / Infrastructure
-> - Other
+> - Web applications (frontend SPAs, SSR sites)
+> - Backend / API services (REST, GraphQL, gRPC, microservices)
+> - Mobile apps (iOS, Android, cross-platform)
+> - Data / ML (pipelines, models, analytics)
+> - DevOps / Infrastructure (IaC, CI/CD, cloud)
+> - CLI tools / Developer tooling
+> - Desktop applications (Electron, Tauri, native)
+> - Libraries / SDKs (reusable packages, open source)
+> - Embedded / IoT
+> - Other (user specifies)
 
 Store selections — these determine which tech stack sections to ask about in Step 2.
 
@@ -273,17 +286,23 @@ If "Edit" → ask which section, re-run that interview section, regenerate.
 Route to the configured doc backend:
 
 **RAG Memory:**
-1. Check if `team-conventions` collection exists via `list_collections()`
-2. If not → create it: `create_collection(name="team-conventions", domain="team conventions and standards", description="Team-wide coding conventions, tech stack decisions, and workflow standards used across all repositories")`
-3. Ingest: `ingest_text(content=document, collection_name="team-conventions", document_title="Team Conventions: {Team Name}", actor_type="Claude Code")`
+1. `list_collections()` — show available collections
+2. Ask user which collection to store in, or suggest creating a new one:
+   > "Where should I store your team conventions? Here are your existing collections:"
+   > [list collections]
+   > "Or I can create a new collection. What should it be called?"
+3. If creating new → `create_collection(name=user_chosen_name, domain="team conventions", description="Team-wide coding conventions, tech stack decisions, and workflow standards")` — let user confirm name and description
+4. Ingest: `ingest_text(content=document, collection_name=chosen_collection, document_title="Team Conventions: {Team Name}", actor_type="Claude Code")`
 
 **Confluence:**
 1. Ask which space to store in (or use `default_space` from config)
-2. Create page: `createConfluencePage(spaceKey=space, title="Team Conventions: {Team Name}", body=document)`
+2. Ask for page title (suggest "Team Conventions: {Team Name}" but let user override)
+3. Create page: `createConfluencePage(spaceKey=space, title=chosen_title, body=document)`
 
 **Google Drive:**
-1. Write document to temp file: `/tmp/team-conventions.md`
-2. Upload: `upload_file(file_path="/tmp/team-conventions.md", name="Team Conventions - {Team Name}.md", folder_id=default_folder_id)`
+1. Ask where to store (suggest `default_folder_id` from config if available, or let user specify)
+2. Write document to temp file: `/tmp/team-conventions.md`
+3. Upload: `upload_file(file_path="/tmp/team-conventions.md", name="Team Conventions - {Team Name}.md", folder_id=chosen_folder)`
 
 ### Confirm
 

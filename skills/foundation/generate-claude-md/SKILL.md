@@ -70,20 +70,24 @@ Attempt to load team conventions from configured doc backend. This is best-effor
 
 **Search for conventions:**
 
+Search broadly — never assume a specific collection name, folder, or page title.
+
 If **RAG Memory** enabled:
-- `search_documents(query="team conventions tech stack coding standards", collection_name="team-conventions")`
+- `search_documents(query="team conventions tech stack coding standards workflow")` — search ALL collections (no `collection_name` filter)
+- If multiple results → show user, ask which is their team conventions doc
 
 If **Confluence** enabled:
-- `searchConfluenceUsingCql(cql="title = 'Team Conventions' AND type = 'page'")`
-- If found → `getConfluencePage(pageId=id)` to load content
+- `searchConfluenceUsingCql(cql="text ~ 'team conventions' AND type = 'page'")` — broad search
+- If found → show results, ask user to confirm, then `getConfluencePage(pageId=id)` to load
 
 If **Google Drive** enabled:
-- `search_files(query="Team Conventions")`
-- If found → `download_file(fileId=id)` to load content
+- `search_files(query="conventions")` and `search_files(query="coding standards")`
+- If found → show results, ask user to confirm, then `download_file(fileId=id)` to load
 
 **Result:**
-- Conventions found → store for reconciliation in Step 2
-- Not found → inform developer: "No team conventions found. I'll generate from repo analysis alone." Proceed to 1b.
+- Conventions found and confirmed → store for reconciliation in Step 2
+- Not found → inform developer: "No team conventions found in any configured backend. I'll generate from repo analysis alone. You can also point me to where conventions are stored."
+- Developer points to a location → load from there. Proceed to 1b.
 
 ### 1b: Analyze Repo
 
