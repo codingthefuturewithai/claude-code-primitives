@@ -132,6 +132,14 @@ git push origin --delete [BRANCH_NAME]
 
 ---
 
+## Known Quirks (@zereight/mcp-gitlab)
+
+| Tool | Issue | Workaround |
+|------|-------|------------|
+| `get_file_contents` | Description says "file or directory" but only works for **files**. Passing a directory path (e.g., `"/"`) returns `400 Bad Request: "file_path should be a valid file path"`. | Use `get_repository_tree` to list directory contents. Use `get_file_contents` only for reading a specific file's content. |
+
+---
+
 ## Error Handling
 
 | Error | Meaning | Action |
