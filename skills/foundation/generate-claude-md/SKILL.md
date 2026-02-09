@@ -1,6 +1,6 @@
 ---
 name: devflow:foundation:generate-claude-md
-description: Analyze a repo and generate a lean CLAUDE.md + .claude/rules/ files. Optionally retrieves team conventions for reconciliation. Use this when setting up a new repo's convention layer or maintaining an existing one.
+description: Analyze a repo, surface deltas against team conventions, and help the developer create or update their convention layer (CLAUDE.md + .claude/rules/). Developer is always in control.
 user-invocable: true
 allowed-tools:
   - Read
@@ -23,94 +23,92 @@ allowed-tools:
 
 **Say exactly:** "SKILL INVOKED: generate-claude-md"
 
-Analyze the current repo, optionally retrieve team conventions, reconcile deviations with you, and generate a lean CLAUDE.md + `.claude/rules/` files.
+Analyze the current repo, optionally retrieve team conventions as advisory context, surface deltas, and help the developer create or update their convention layer. The developer decides everything.
 
 **All generated files are standalone** — they work for any Claude Code user, no plugin required.
 
 ## Critical Rules
 
-- **Developer has override authority.** Conventions are defaults, not mandates.
-- **Every deviation is surfaced.** Nothing silently ignored or changed.
-- **Standalone output.** Generated files must not reference DevFlow, this plugin, or any external system.
-- **Keep CLAUDE.md lean.** ~60 lines max. Everything else goes in `.claude/rules/`.
+- **Developer is the authority.** Team conventions are advisory context, not mandates. The developer decides what goes into their repo — including nothing at all.
+- **Observe, don't prescribe.** Surface deltas as observations ("I notice this repo uses X, team conventions say Y"), never as directives ("You should change X to Y").
+- **Generate only what's approved.** Never write files the developer didn't explicitly approve.
+- **Trust Claude's intelligence.** Don't spell out what Claude already knows about languages, frameworks, or tools. Focus on team-specific decisions and project-specific patterns Claude can't infer.
+- **Keep it compact.** CLAUDE.md ~60 lines max. Rules files should be concise directives, not tutorials.
+- **Respect what exists.** If there's already a CLAUDE.md or rules files, they represent the developer's current intent. Don't assume they need replacing.
+- **No separate modes.** The flow is always the same: understand what's here → retrieve conventions → show deltas → developer decides → write what they approved. The starting context differs (greenfield vs existing vs already has rules), but the conversation is the same.
 
 ---
 
-## Step 0: Detect Mode
+## Step 1: Understand What's Here
 
-Check the current repo state to determine which mode to run:
+### 1a: Detect Repo Shape
+
+Determine where you are and what kind of repo this is.
+
+```bash
+git rev-parse --show-toplevel    # Find repo root
+pwd                               # Current directory
+```
+
+**Check for monorepo indicators** (at repo root):
+```
+Glob: pnpm-workspace.yaml, lerna.json, nx.json, turbo.json,
+      rush.json, package.json (check for "workspaces" field),
+      Cargo.toml (check for [workspace]), go.work
+```
+
+**Classify the situation:**
+
+| Where am I? | Monorepo? | Scope |
+|---|---|---|
+| Repo root | No | Single-project repo |
+| Repo root | Yes | Monorepo root — team-general conventions belong here |
+| Project directory in monorepo | Yes | Project-level — project-specific only, don't duplicate root |
+| Arbitrary subdirectory | — | Ask: "You're in `{path}`. Should I scope to the repo root, a specific project, or this directory?" |
+
+**If at monorepo root**, identify the projects:
+- List workspace members / top-level project directories
+- Note which have their own package files, CLAUDE.md, or `.claude/rules/`
+
+**If at project level in monorepo**, check what exists at root:
+- Root CLAUDE.md? Root `.claude/rules/`?
+- Note what's already covered at root — don't duplicate it
+
+Announce:
+> "I'm in `{path}`. This looks like a **{single-project repo / monorepo root with N projects / project within a monorepo}**."
+
+### 1b: Check Existing Convention Layer
 
 ```
-Check 1: Does CLAUDE.md exist? (root or .claude/CLAUDE.md)
-Check 2: Does .claude/rules/ exist with .md files?
-Check 3: Are there substantial source files? (package.json, src/, lib/, app/, etc.)
+Glob: CLAUDE.md, .claude/CLAUDE.md
+Glob: .claude/rules/*.md
 ```
 
-| CLAUDE.md exists | `.claude/rules/` exists | Substantial code | Mode |
-|:---:|:---:|:---:|------|
-| Yes | Yes | - | **Maintenance** (Step 4) |
-| Yes | No | - | **Existing Repo** (Step 1) — will migrate to modular rules |
-| No | No | Yes | **Existing Repo** (Step 1) |
-| No | No | No | **Greenfield** (Step 3) |
+If files exist, read them — they represent the developer's current intent.
 
-Announce the detected mode:
-> "Detected mode: **{mode}**. {brief explanation of what this means}."
+### 1c: Analyze the Repo/Project
 
----
+Use parallel tool calls where possible.
 
-## Step 1: Existing Repo — Gather Inputs
-
-### 1a: Retrieve Team Conventions (Optional)
-
-Attempt to load team conventions from configured doc backend. This is best-effort — the skill works without them.
-
-**Load DevFlow config:**
-1. Read `~/.claude/plugins/config/devflow/config.md`
-2. If no config → skip conventions, proceed to 1b
-
-**Search for conventions:**
-
-Search broadly — never assume a specific collection name, folder, or page title.
-
-If **RAG Memory** enabled:
-- `search_documents(query="team conventions tech stack coding standards workflow")` — search ALL collections (no `collection_name` filter)
-- If multiple results → show user, ask which is their team conventions doc
-
-If **Confluence** enabled:
-- `searchConfluenceUsingCql(cql="text ~ 'team conventions' AND type = 'page'")` — broad search
-- If found → show results, ask user to confirm, then `getConfluencePage(pageId=id)` to load
-
-If **Google Drive** enabled:
-- `search_files(query="conventions")` and `search_files(query="coding standards")`
-- If found → show results, ask user to confirm, then `download_file(fileId=id)` to load
-
-**Result:**
-- Conventions found and confirmed → store for reconciliation in Step 2
-- Not found → inform developer: "No team conventions found in any configured backend. I'll generate from repo analysis alone. You can also point me to where conventions are stored."
-- Developer points to a location → load from there. Proceed to 1b.
-
-### 1b: Analyze Repo
-
-Analyze the repository to understand its current state. Use parallel tool calls where possible.
-
-**Package files** — detect stack, dependencies, scripts:
+**Package files** — detect stack and dependencies:
 ```
-Glob: package.json, pyproject.toml, Cargo.toml, go.mod, pom.xml, build.gradle,
-      Gemfile, requirements.txt, setup.py, setup.cfg
+Glob: package.json, pyproject.toml, Cargo.toml, go.mod, pom.xml,
+      build.gradle, Gemfile, requirements.txt, setup.py, setup.cfg,
+      composer.json, mix.exs, Project.toml
 ```
 Read each found file for dependencies, scripts, and configuration.
 
-**Config files** — detect existing conventions:
+**Config files** — detect existing tool conventions:
 ```
 Glob: .eslintrc*, eslint.config.*, .prettierrc*, prettier.config.*,
-      tsconfig*.json, .editorconfig, ruff.toml, pyproject.toml [tool.ruff],
-      .golangci.yml, rustfmt.toml, .stylelintrc*, biome.json
+      tsconfig*.json, .editorconfig, ruff.toml, .golangci.yml,
+      rustfmt.toml, .stylelintrc*, biome.json, .clang-format
 ```
 
 **CI/CD config** — extract build/test commands:
 ```
 Glob: .github/workflows/*.yml, .gitlab-ci.yml, Jenkinsfile,
-      .circleci/config.yml, Makefile, Taskfile.yml, justfile
+      .circleci/config.yml, Makefile, Taskfile.yml, justfile, Dockerfile
 ```
 
 **Directory structure:**
@@ -124,238 +122,253 @@ ls -la  # Root directory
 Glob: README.md, README.rst, README.txt, README
 ```
 
-**Existing AI config** — migrate relevant content:
+**Existing AI config** — note any existing conventions:
 ```
 Glob: .cursorrules, .github/copilot-instructions.md, .aider*
 ```
 
 **Git history** — infer patterns:
 ```bash
-git log --oneline -20  # Recent commit message patterns
-git branch -a          # Branching patterns
+git log --oneline -20    # Recent commit message patterns
+git branch -a 2>/dev/null | head -20   # Branching patterns
 ```
 
-**Compile analysis into structured findings:**
-- Detected stack (languages, frameworks, key dependencies)
-- Detected conventions (formatter, linter, type config)
-- Build/test commands (from scripts, CI, Makefile)
-- Project structure (key directories and their purposes)
-- Project context (from README)
-- Existing AI config content (if any)
-
-Present summary to developer:
-> "Here's what I found in the repo:"
-> [Structured summary of findings]
+For **greenfield repos** (minimal or no code): most of this returns nothing — that's fine. Note what's absent.
 
 ---
 
-## Step 2: Reconciliation (if team conventions exist)
+## Step 2: Retrieve Team Conventions (Optional)
 
-Compare repo analysis against team conventions. For each topic, classify:
+Attempt to load team conventions from the configured doc backend. These are **advisory context** — not requirements to apply.
 
-**Aligned** — repo matches convention (no action needed):
-> "Repo uses {X} — matches team convention."
+**Load DevFlow config:**
+1. Read `~/.claude/plugins/config/devflow/config.md`
+2. If no config → skip conventions, proceed to Step 3
 
-**Deviation** — repo differs from convention (developer decides):
-> "Repo uses {X}, but team convention specifies {Y}."
+**Search broadly** — never assume a specific collection name, folder, or page title:
 
-Use AskUserQuestion:
-- Keep repo's choice (rules reflect actual repo state)
-- Align with convention (rules reflect the team convention)
-- Customize (developer specifies something different)
+If **RAG Memory** enabled:
+- `search_documents(query="team conventions tech stack coding standards workflow")` — no `collection_name` filter
+- If multiple results → show developer, ask which is their team conventions doc
 
-**Not covered** — repo has something conventions don't address:
-> "Repo uses {X} — team conventions don't specify this."
-> Captured as-is in rules.
+If **Confluence** enabled:
+- `searchConfluenceUsingCql(cql="text ~ 'team conventions' AND type = 'page'")`
+- If found → show results, ask developer to confirm, then `getConfluencePage(pageId=id)`
 
-**Missing from repo** — convention specifies something not found in repo:
-> "Team convention requires {X}, but not found in repo."
+If **Google Drive** enabled:
+- `search_files(query="conventions")` and `search_files(query="coding standards")`
+- If found → show results, ask developer to confirm, then `download_file(fileId=id)`
 
-Use AskUserQuestion:
-- Add to rules
-- Skip for now
-- Customize
-
-**Batch resolution:** If there are many deviations, offer:
-> "Accept all team conventions for uncontested items? You can override specific ones."
-
-Track all resolutions — these feed into Step 2b.
-
-### 2b: Compile Resolved Decisions
-
-After all deviations are resolved, compile the final set of decisions:
-- Per-topic rules (coding standards, testing, git workflow, architecture)
-- Build/test commands (from repo analysis)
-- Project overview (from README + analysis)
-- Key directories (from structure analysis)
-
-Proceed to Step 2c (Generate).
-
-### 2c: Generate
-
-Follow the generation process in **Step 5: Generate Files**.
+**Result:**
+- Found and confirmed → store as advisory reference for Step 3
+- Not found → proceed without. Inform developer: "No team conventions found. I'll work from the repo analysis."
 
 ---
 
-## Step 3: Greenfield Repo
+## Step 3: Present the Picture
 
-### 3a: Retrieve Team Conventions (Optional)
+Show the developer a clear, honest picture of their repo. If team conventions are available, show how the repo relates to them.
 
-Same process as Step 1a.
+### Existing Repo (has code)
 
-### 3b: Gather Project Info
+Present the repo analysis:
+> "Here's what I found in your repo:"
+> - **Stack:** {languages, frameworks, key dependencies}
+> - **Build/test:** {detected commands}
+> - **Structure:** {key directories and their purposes}
+> - **Existing convention layer:** {what CLAUDE.md and rules files exist and cover}
+> - **Detected tool config:** {formatter, linter, type config from config files}
 
-Ask:
-> "What type of project is this?"
+If team conventions available, present deltas as neutral observations:
 
-If team conventions exist, present applicable stacks:
-> "Your team conventions define these project types: {list}. Which applies?"
+> "Your team conventions are available for reference. Here's how this repo compares:"
+>
+> **Aligned:**
+> - {item} — matches convention
+>
+> **Differences:**
+> - This repo uses {X}. Team conventions say {Y}.
+>
+> **In conventions but not in repo:**
+> - Team conventions specify {X}. Not found in this repo.
+>
+> **In repo but not in conventions:**
+> - This repo uses {X}. Not covered by team conventions.
 
-Ask:
-> "Do you have a PRD or project brief I can analyze for context?"
-> If yes → ask for path or paste, analyze for architectural decisions.
+**Important framing:** Every delta is an observation. No judgment, no recommendation. "This repo uses Mantine 8. Team conventions specify shadcn/ui." Full stop. The developer knows their repo better than the skill does.
 
-### 3c: Interview or Apply Conventions
+### Greenfield Repo (minimal or no code)
 
-**If conventions exist:**
-Present applicable conventions for this project type. For each section, ask:
-> "Team convention for {topic}: {value}. Accept, override, or customize?"
+> "This looks like a new repo."
 
-**If no conventions:**
-Run a lighter interview — just the essentials for this repo:
-- Language and framework
-- Testing framework and approach
-- Git workflow basics
-- Key architectural decisions
+If team conventions available:
+> "Your team conventions cover these project types: {list from conventions}. What are you building?"
 
-### 3d: Generate
+Ask project type. Then ask:
+> "Do you have a PRD, project brief, or description I can use for context?"
+> - Yes → ask for path or paste, analyze for architectural decisions and project context
+> - No → proceed with project type + conventions
 
-Follow **Step 5: Generate Files**, but add TODO markers for details that will emerge:
+If no conventions:
+> "No team conventions found. What type of project will this be? I can help scaffold a starting CLAUDE.md."
 
+### Already Has Convention Layer
+
+If CLAUDE.md and/or `.claude/rules/` exist:
+> "You already have a convention layer. Here's what it covers:"
+> [Summary of existing files]
+
+If team conventions available, show drift:
+> "Since your last sync, here's what changed:"
+> - **Convention layer says {X}, repo now does {Y}** (repo drifted)
+> - **Team conventions now say {X}, your rules say {Y}** (conventions updated)
+> - **Rules mention {X} but it no longer exists in the repo** (stale content)
+
+---
+
+## Step 4: Developer Decides
+
+Ask what the developer wants help with. Adapt options to context.
+
+Use AskUserQuestion (multiSelect):
+> "What would you like me to help with?"
+
+**If no convention layer exists:**
+- Create a CLAUDE.md (build commands, key directories, project notes)
+- Add a team conventions reference file (`.claude/rules/team-conventions.md`)
+- Document project architecture (`.claude/rules/architecture.md`)
+- Nothing right now — I'll set things up myself
+
+**If convention layer already exists:**
+- Update CLAUDE.md with current repo state
+- Update or add team conventions reference
+- Update or add architecture notes
+- Walk me through the deltas so I can decide what to change
+- Leave everything as is
+
+**If greenfield:**
+- Scaffold a starting CLAUDE.md from project type (+ conventions if available)
+- Just create a minimal CLAUDE.md — I'll fill it in as the project develops
+- Nothing yet — too early
+
+**If at monorepo root:**
+- Create root CLAUDE.md (workspace overview, shared commands)
+- Add team conventions reference at root level
+- Help me set up per-project convention layers
+- Nothing right now
+
+The developer may select multiple items or none. **"Nothing" is a perfectly valid answer.** Respect it.
+
+---
+
+## Step 5: Draft and Review
+
+For each item the developer selected, draft the content and present for review.
+
+### CLAUDE.md
+
+Focus on what Claude can't figure out on its own:
+- Project name and one-line description
+- Build, run, and test commands (exact commands from package files, CI, Makefile)
+- Key directories with brief descriptions
+- Important notes / gotchas / environment quirks
+- Environment variables (if applicable)
+
+Target ~60 lines. **Do NOT include:** coding standards, testing philosophy, git workflow, architectural explanations, or anything Claude already knows about the tech stack. Those are either covered by conventions, in separate rules files, or unnecessary.
+
+**For greenfield:** include what's known, use TODO markers for what will emerge:
 ```markdown
 <!-- TODO: Update build commands after initial setup -->
 <!-- TODO: Add key directories once project structure is established -->
 ```
 
----
+**For monorepo root:** workspace structure, shared commands, how projects relate, how to navigate.
 
-## Step 4: Maintenance Mode
+**For project in monorepo:** this project's commands, directories, gotchas. Note: "Team conventions and shared rules are at the repo root."
 
-### 4a: Load Current Convention Layer
+### Team Conventions Reference (.claude/rules/team-conventions.md)
 
-Read existing files:
+Only if the developer asked for it. Include relevant sections from team conventions — compact, in the team's own words, not rewritten or expanded.
+
+```markdown
+# Team Conventions Reference
+
+Source: {where conventions are stored}
+Last synced: {YYYY-MM-DD}
+
+## Applicable Conventions
+{Relevant sections from team conventions document, compactly}
+
+## This Repo's Differences
+- {What}: {repo value} (convention: {convention value})
 ```
-Read: CLAUDE.md (or .claude/CLAUDE.md)
-Glob: .claude/rules/*.md
-```
-Read each rules file.
 
-### 4b: Retrieve Team Conventions (Optional)
+Keep it factual. The "Differences" section captures what IS, not what SHOULD BE.
 
-Same process as Step 1a.
+**For monorepo:** this file belongs at the repo root, not in each project directory. Claude Code loads parent rules recursively, so project-level work inherits root rules automatically.
 
-### 4c: Analyze Current Repo State
+**For project in monorepo where root already has this file:** don't create a duplicate. If the project has project-specific differences, create a separate file (e.g., `.claude/rules/project-notes.md`).
 
-Same analysis as Step 1b.
+### Architecture Notes (.claude/rules/architecture.md)
 
-### 4d: Drift Report
+Only if the developer asked for it AND the project has patterns worth documenting. Focus on:
+- Architectural decisions and the reasoning behind them (the "why")
+- How to add common things (new view, new endpoint, new module, new service)
+- Key constraints or non-obvious patterns
+- Things Claude would get wrong without this context
 
-Compare three sources: existing rules, team conventions, and current repo state.
+**Don't document:** things Claude can figure out by reading code, general framework knowledge, standard patterns.
 
-**Convention drift** (team conventions changed since last sync):
-> "Team convention now specifies {X}. Your rules say {Y}."
+### Other Rules Files
 
-**Repo drift** (repo changed but rules haven't):
-> "New directory `{path}` detected — not covered by rules."
-> "New dependency `{dep}` added — not mentioned in rules."
-> "Build commands in CI differ from what CLAUDE.md says."
+If the developer wants additional rules files for specific topics, draft them. Keep them concise — directives, not explanations.
 
-**Stale content** (rules reference things that don't exist):
-> "Rules mention `{path}` but it no longer exists."
-> "Rules reference `{dep}` but it's not in dependencies."
-
-For each item, use AskUserQuestion to resolve:
-- Update rules to match current state
-- Keep current rules
-- Customize
-
-### 4e: Update Files
-
-Apply resolved changes to affected files only. Present diffs to developer before writing.
-
-Proceed to **Step 5: Generate Files** (update mode — only regenerate changed files).
-
+For monorepo path-scoping:
+```yaml
 ---
+paths:
+  - "packages/frontend/**"
+---
+```
 
-## Step 5: Generate Files
+### Present for Review
 
-### 5a: Generate Root CLAUDE.md
+Show all drafted files with full content:
 
-Use the template from [references/templates/claude-md.md](references/templates/claude-md.md).
-
-Target: ~60 lines. Include only:
-- Project name and one-line description
-- Build & run commands
-- Test commands
-- Key directories with brief descriptions
-- Important notes (gotchas, environment quirks)
-
-**Do NOT include in CLAUDE.md:** Coding standards, testing philosophy, git workflow, architecture decisions — those go in `.claude/rules/`.
-
-### 5b: Generate Rules Files
-
-For each topic with resolved decisions, generate a rules file using the templates in [references/templates/](references/templates/).
-
-Each rules file should:
-- Be focused on ONE topic
-- Contain clear, actionable directives (not descriptions)
-- Use path-scoping frontmatter for monorepos where applicable
-- Include provenance footer: `<!-- Generated by generate-claude-md | Last synced: {YYYY-MM-DD} -->`
-
-**Standard rules files:**
-- `.claude/rules/coding-standards.md` — from [references/templates/coding-standards.md](references/templates/coding-standards.md)
-- `.claude/rules/testing.md` — from [references/templates/testing.md](references/templates/testing.md)
-- `.claude/rules/git-workflow.md` — from [references/templates/git-workflow.md](references/templates/git-workflow.md)
-- `.claude/rules/architecture.md` — from [references/templates/architecture.md](references/templates/architecture.md)
-
-Only generate rules files that have substance. If a topic has no meaningful rules (e.g., "use language defaults for everything"), skip that file.
-
-### 5c: Present for Review
-
-Show all generated files with full content:
-
-> "Here are the files I'll create:"
+> "Here's what I'll create:"
 >
 > **CLAUDE.md** (~{N} lines):
 > ```
 > [full content]
 > ```
 >
-> **.claude/rules/coding-standards.md** (~{N} lines):
+> **.claude/rules/{filename}.md** (~{N} lines):
 > ```
 > [full content]
 > ```
-> [... for each file]
+> [repeat for each file]
 
 Ask:
 > 1. Write all files
 > 2. Edit a file before writing
-> 3. Cancel
+> 3. Drop a file (don't create it)
+> 4. Cancel everything
 
-If "Edit" → ask which file and what to change, regenerate, re-present.
+If "Edit" → ask what to change, redraft, re-present.
 
-### 5d: Write Files
+---
+
+## Step 6: Write Approved Files
 
 1. Create `.claude/rules/` directory if needed: `mkdir -p .claude/rules`
-2. Write each file
+2. Write each approved file
 3. Confirm what was written
+4. Suggest commit:
 
-### 5e: Suggest Commit
-
-> "Convention layer generated. Suggested commit:"
+> "Convention layer {created / updated}. Suggested commit:"
 > ```
 > git add CLAUDE.md .claude/rules/
-> git commit -m "feat: Add convention layer (CLAUDE.md + .claude/rules/)"
+> git commit -m "{feat/chore}: {Add/Update} convention layer (CLAUDE.md + .claude/rules/)"
 > ```
 > Want me to commit these files?
 
@@ -363,7 +376,6 @@ If "Edit" → ask which file and what to change, regenerate, re-present.
 
 ## ⛔ STOP
 
-Skill complete. Convention layer generated.
+Skill complete.
 
-> **Maintenance:** Re-run this skill anytime to detect drift and update your convention layer.
-> **Team conventions:** If your team updates their conventions, re-run to sync.
+> **Next:** Re-run this skill anytime to check for drift between your repo, your convention layer, and team conventions.
