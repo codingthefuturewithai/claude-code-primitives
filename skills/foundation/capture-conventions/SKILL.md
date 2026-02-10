@@ -234,11 +234,16 @@ Confirm section.
 ## Step 7: Git & Workflow
 
 Ask about:
-- **Branching strategy** — trunk-based, GitFlow, GitHub Flow
-- **Branch naming** — convention pattern
-- **Commit message format** — Conventional Commits, freeform, other
-- **PR/MR requirements** — reviewers, CI, squash vs merge
-- **Release process** — tags, release branches, automated
+- **Branching strategy** — Git Flow, GitHub Flow, trunk-based, custom
+- **Branch naming** — conventions for feature, bugfix, hotfix branches
+- **Commit message format** — Conventional Commits, issue key prefix, freeform
+- **PR/MR size and reviews** — preferred PR/MR size, number of approvals, CODEOWNERS
+- **CI requirements** — what must pass before merge? (e.g., tests, lint, type check, security scan, coverage threshold)
+- **Merge strategy** — squash, merge commit, rebase
+- **Release process** — tags, release branches, automated from main, manual
+- **Environment promotion** — how code moves from dev → staging → production
+
+See [references/interview-guide.md](references/interview-guide.md) for the full question bank.
 
 Confirm section.
 

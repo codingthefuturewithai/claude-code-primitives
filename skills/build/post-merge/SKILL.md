@@ -205,7 +205,7 @@ Your environment is ready. When you're ready to start your next issue, run:
 
 This will begin a new development cycle with:
 - Fresh issue fetch and feasibility analysis
-- New branch creation (in plan-work → implement)
+- New branch creation (in plan-issue → implement)
 - Clean workspace
 
 ---

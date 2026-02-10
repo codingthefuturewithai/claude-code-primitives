@@ -56,8 +56,8 @@ Skills are intelligent workflows that Claude invokes based on context or explici
 | `/knowledge-management` | Routes content to RAG Memory or docs backend |
 | `/repo-explorer` | Explores and analyzes GitHub repository structure |
 | `/devflow:build:fetch-issue` | Fetch issue and analyze feasibility |
-| `/devflow:build:plan-work` | Analyze issue and develop implementation plan |
-| `/devflow:build:implement-plan` | Execute approved implementation plan |
+| `/devflow:build:plan-issue` | Analyze issue and develop implementation plan |
+| `/devflow:build:implement-issue` | Execute approved implementation plan |
 | `/devflow:build:create-issue` | Create issue with codebase analysis |
 | `/devflow:build:complete-issue` | Final validation, create PR/MR, mark issue done |
 | `/devflow:build:post-merge` | Sync with remote after PR/MR merge |

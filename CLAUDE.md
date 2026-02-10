@@ -119,8 +119,8 @@ Then start a new Claude Code session and:
 
 ### Build Workflow (SDLC)
 - `/devflow:build:fetch-issue` - Fetch issue and analyze feasibility
-- `/devflow:build:plan-work` - Create implementation plan
-- `/devflow:build:implement-plan` - Execute approved plan
+- `/devflow:build:plan-issue` - Create implementation plan
+- `/devflow:build:implement-issue` - Execute approved plan
 - `/devflow:build:security-review` - Security analysis
 - `/devflow:build:complete-issue` - Create PR/MR and close issue
 - `/devflow:build:post-merge` - Cleanup after merge

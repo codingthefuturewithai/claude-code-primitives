@@ -1,5 +1,5 @@
 ---
-name: devflow:build:plan-work
+name: devflow:build:plan-issue
 description: Analyze issue and develop implementation plan. Use this after fetching an issue to create a detailed plan before implementation.
 argument-hint: "[--tdd] [ISSUE-KEY, GitLab issue number, or GitHub issue number]"
 disable-model-invocation: true
@@ -332,7 +332,7 @@ Your implementation plan has been saved to: `.devflow/plans/$ARGUMENTS.md`
 **By default, implementation pauses after each increment for your review:**
 
 ```bash
-/devflow:build:implement-plan $ARGUMENTS
+/devflow:build:implement-issue $ARGUMENTS
 ```
 
 This incremental mode will pause after each logical unit (commit) so you can:
@@ -345,7 +345,7 @@ This incremental mode will pause after each logical unit (commit) so you can:
 **OR run all increments continuously without pauses:**
 
 ```bash
-/devflow:build:implement-plan --auto $ARGUMENTS
+/devflow:build:implement-issue --auto $ARGUMENTS
 ```
 
 Auto mode runs through all logical units from start to finish. Use this when you trust the plan and want hands-off execution.
@@ -382,7 +382,7 @@ I'll update `.devflow/plans/$ARGUMENTS.md` and present the revised version.
 
 **This command has finished its job.** The plan is saved and ready for implementation.
 
-**No code has been written.** This command ONLY creates plans - the `/devflow:build:implement-plan` command handles all code changes, testing, commits, and PR/MR creation.
+**No code has been written.** This command ONLY creates plans - the `/devflow:build:implement-issue` command handles all code changes, testing, commits, and PR/MR creation.
 
 ---
 
@@ -398,4 +398,4 @@ Do NOT:
 - Create pull requests
 - Use Edit or MultiEdit tools
 
-The `/devflow:build:implement-plan` command will handle all implementation tasks.
+The `/devflow:build:implement-issue` command will handle all implementation tasks.

@@ -1,6 +1,6 @@
 ---
-name: devflow:build:implement-plan
-description: Execute approved implementation plan. Use this after plan-work to implement the code changes according to the approved plan.
+name: devflow:build:implement-issue
+description: Execute approved implementation plan. Use this after plan-issue to implement the code changes according to the approved plan.
 argument-hint: "[--auto] [ISSUE-KEY, GitLab issue number, or GitHub issue number]"
 disable-model-invocation: true
 user-invocable: true
@@ -26,7 +26,7 @@ I'll execute the approved implementation plan for $ARGUMENTS.
 
 **Prerequisites:**
 - Approved plan at `.devflow/plans/$ARGUMENTS.md`
-- Run `/devflow:build:plan-work $ARGUMENTS` if plan doesn't exist
+- Run `/devflow:build:plan-issue $ARGUMENTS` if plan doesn't exist
 
 ---
 
@@ -45,7 +45,7 @@ See `skills/build-ops/SKILL.md`.
 1. Use Read tool to load `.devflow/plans/$ARGUMENTS.md`
 2. If file doesn't exist:
    - ❌ ERROR: "No implementation plan found for $ARGUMENTS"
-   - Tell user: "Please run `/devflow:build:plan-work $ARGUMENTS` first to create a plan"
+   - Tell user: "Please run `/devflow:build:plan-issue $ARGUMENTS` first to create a plan"
    - STOP - cannot proceed without approved plan
 3. Extract from plan:
    - Issue summary and type
@@ -566,7 +566,7 @@ Cannot proceed because: [reason]
 
 **Action required:** The current plan needs significant revision.
 
-Please run `/devflow:build:plan-work $ARGUMENTS` to revise the plan, then return to `/devflow:build:implement-plan $ARGUMENTS`.
+Please run `/devflow:build:plan-issue $ARGUMENTS` to revise the plan, then return to `/devflow:build:implement-issue $ARGUMENTS`.
 
 DO NOT continue implementation - the plan at `.devflow/plans/$ARGUMENTS.md` must be updated first.
 

@@ -90,12 +90,12 @@ Based on the feasibility analysis above, decide next steps:
 
 Standard workflow:
 ```
-/devflow:build:plan-work $ARGUMENTS
+/devflow:build:plan-issue $ARGUMENTS
 ```
 
 **OR** with Test-Driven Development:
 ```
-/devflow:build:plan-work --tdd $ARGUMENTS
+/devflow:build:plan-issue --tdd $ARGUMENTS
 ```
 
 TDD mode will:

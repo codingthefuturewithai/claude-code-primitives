@@ -34,7 +34,7 @@ Scan the build directory to find all available commands.
 The DevFlow commands follow this progression:
 
 ```
-fetch-issue → plan-work → implement-plan → security-review → complete-issue → post-merge
+fetch-issue → plan-issue → implement-issue → security-review → complete-issue → post-merge
     ↓            ↓             ↓                ↓                 ↓              ↓
  Fetch &     Branch +       Execute        Security          PR/MR +       Cleanup
  Analyze    Plan Mode        Plan            Scan            Close Issue    & Sync
@@ -71,8 +71,8 @@ Present each discovered command in this format:
 
 **Position in workflow:** [Based on command name, indicate where it fits]
 - fetch-issue: Start of workflow
-- plan-work: After fetch, before implementation
-- implement-plan: After plan approval
+- plan-issue: After fetch, before implementation
+- implement-issue: After plan approval
 - security-review: After implementation (recommended)
 - complete-issue: After security review or implementation
 - post-merge: After PR/MR merged
@@ -147,10 +147,10 @@ Present each discovered command in this format:
 /devflow:build:fetch-issue ACT-123
 
 # 2. Create branch and plan (after feasibility check)
-/devflow:build:plan-work ACT-123
+/devflow:build:plan-issue ACT-123
 
 # 3. Execute plan (after plan approval)
-/devflow:build:implement-plan ACT-123
+/devflow:build:implement-issue ACT-123
 
 # 4. Security review (recommended)
 /devflow:build:security-review ACT-123
@@ -167,9 +167,9 @@ Present each discovered command in this format:
 # Same commands, different backend
 /devflow:build:fetch-issue 42
 
-/devflow:build:plan-work 42
+/devflow:build:plan-issue 42
 
-/devflow:build:implement-plan 42
+/devflow:build:implement-issue 42
 
 /devflow:build:security-review 42
 
