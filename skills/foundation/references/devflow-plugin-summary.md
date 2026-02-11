@@ -237,7 +237,7 @@ The plugin enforces ACTIVITIES (you must update docs, you must follow test patte
 | Skill | Purpose | User-Invocable |
 |-------|---------|----------------|
 | **devflow-setup** | Configure backends (Jira/GitLab/GitHub, Confluence/Google Drive/RAG Memory, GitHub/GitLab) | Yes |
-| **devflow-guide** | Discover all plugin primitives — skills, sub-agents, hooks, commands | Yes |
+| **plugin-overview** | DevFlow plugin overview — discover all skills, agents, hooks, and commands with entry points | Yes |
 | **knowledge-management** | Route content to RAG Memory or docs backend for storage | Yes |
 | **repo-explorer** | Explore and analyze GitHub repositories | Yes |
 | **capture-conventions** | Guided interview to capture team conventions | Yes |

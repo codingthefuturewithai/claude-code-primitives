@@ -1,6 +1,6 @@
 ---
-name: devflow:guide
-description: Discover all DevFlow plugin primitives - skills, sub-agents, hooks, and commands with descriptions and usage
+name: devflow:plugin-overview
+description: DevFlow plugin overview - discover all skills, agents, hooks, and commands with entry points for each workflow
 argument-hint: "[build|pm|foundation|docs|rag-memory|devops|setup-utilities|hooks|agents|all]"
 disable-model-invocation: false
 user-invocable: true
@@ -12,7 +12,7 @@ allowed-tools:
 
 # DevFlow Plugin Guide
 
-**Say exactly:** "SKILL INVOKED: devflow:guide"
+**Say exactly:** "SKILL INVOKED: devflow:plugin-overview"
 
 **Request:** $ARGUMENTS
 
@@ -56,7 +56,7 @@ Every non-hidden file in `${CLAUDE_PLUGIN_ROOT}/agents/` is an agent definition 
 
 If $ARGUMENTS matches a category key, "hooks", or "agents", show only that section and end with:
 
-> Run `/devflow:guide` with no arguments to see the full guide.
+> Run `/devflow:plugin-overview` with no arguments to see the full guide.
 
 If $ARGUMENTS is empty or "all", show the full guide below.
 

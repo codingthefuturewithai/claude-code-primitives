@@ -240,6 +240,6 @@ Say: "DevFlow configured! Your backends are ready."
 
 > **Reconfigure anytime:** `/devflow-setup`
 >
-> **Full guide:** `/devflow:guide` to see all skills, hooks, and usage
+> **Full guide:** `/devflow:plugin-overview` to see all skills, hooks, and usage
 >
 > **If you enabled RAG Memory:** Run `/devflow:rag-memory:setup-collections` to create recommended collections
