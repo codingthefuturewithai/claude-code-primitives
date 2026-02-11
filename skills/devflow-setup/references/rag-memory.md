@@ -4,7 +4,7 @@
 
 Test RAG Memory MCP access:
 ```
-Call mcp__rag-memory__list_collections
+Call mcp__rag-memory-primary__list_collections
 ```
 
 ---

@@ -23,10 +23,14 @@ claude-code-primitives/
 │       │   ├── docs/         # Documentation audit commands
 │       │   └── devops/       # DevOps commands
 │       ├── skills/           # Symlinks to standalone skills
+│       ├── agents/           # Symlinks to standalone agents
 │       └── hooks/            # Hooks for the plugin
 ├── commands/                 # Standalone commands (can be reused across plugins)
 ├── skills/                   # Standalone skills with SKILL.md and references/
-└── hooks/                    # Standalone hooks
+├── agents/                   # Standalone custom subagents
+├── hooks/                    # Standalone hooks
+└── docs/                     # Reference documentation
+    └── primitives/           # Claude Code primitives reference (skills, agents, hooks, plugins)
 ```
 
 ## Version Files - BOTH Must Be Updated
@@ -101,11 +105,30 @@ Then start a new Claude Code session and:
 |-----------|---------|
 | `commands/` | Standalone slash commands |
 | `skills/` | Standalone skills with SKILL.md and references/ |
+| `agents/` | Standalone custom subagents (markdown files with YAML frontmatter) |
+| `hooks/` | Standalone hooks |
+| `docs/primitives/` | Claude Code primitives reference documentation |
 | `plugins/devflow/adapters/` | Backend adapter patterns and setup instructions |
 | `plugins/devflow/commands/build/` | SDLC workflow commands |
 | `plugins/devflow/commands/admin/` | Setup and configuration |
+| `plugins/devflow/skills/` | Symlinks to standalone skills |
+| `plugins/devflow/agents/` | Symlinks to standalone agents |
 | `plugins/devflow/hooks/` | Pre/post tool use hooks |
 | `.devflow/plans/` | Implementation plans for issues |
+
+## Symlinks
+
+Symlinks in `plugins/devflow/skills/` and `plugins/devflow/agents/` exist **only to reuse standalone components across plugins within this repository**. Symlinks are NOT required for plugin distribution — Claude Code copies the entire plugin directory to cache during installation, resolving symlinks in the process.
+
+## Claude Code Primitives
+
+For comprehensive reference on skills, subagents, hooks, and plugin architecture, see `docs/primitives/`. Key files:
+
+- `docs/primitives/skills.md` — SKILL.md format, frontmatter fields, execution model
+- `docs/primitives/subagents.md` — Agent file format, frontmatter fields, invocation
+- `docs/primitives/hooks.md` — Hook events, types, configuration
+- `docs/primitives/plugin-architecture.md` — Plugin structure, distribution, namespacing
+- `docs/primitives/how-they-relate.md` — How all primitives connect and when to use each
 
 ## Supported Backends
 
@@ -133,6 +156,13 @@ Then start a new Claude Code session and:
 ### RAG Memory
 - `/devflow:rag-memory:setup-collections` - Scaffold RAG Memory collections
 - `/devflow:rag-memory:create-agent-preferences` - Create agent preferences collection
+
+### PM (Upstream SDLC)
+- `/devflow:pm:discover` - Problem discovery and framing
+- `/devflow:pm:define-prd` - Create, import, or update a PRD
+- `/devflow:pm:define-architecture` - Architecture design and ADRs
+- `/devflow:pm:plan-iterations` - Work decomposition and iteration planning
+- `/devflow:pm:sync-artifacts` - Cross-artifact consistency check (read-only)
 
 ### Skills
 - `/knowledge-management` - Route content to RAG Memory or docs backend

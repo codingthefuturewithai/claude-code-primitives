@@ -1,7 +1,7 @@
 ---
 name: devflow:guide
 description: Discover all DevFlow plugin primitives - skills, sub-agents, hooks, and commands with descriptions and usage
-argument-hint: "[build|pm|docs|rag-memory|devops|hooks|agents|all]"
+argument-hint: "[build|pm|foundation|docs|rag-memory|devops|hooks|agents|all]"
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:
@@ -22,12 +22,13 @@ allowed-tools:
 Execute the discovery script to find all plugin primitives:
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/devflow-guide/scripts/discover.py"
+python3 "${CLAUDE_PLUGIN_ROOT}/skills/devflow-guide/scripts/discover.py" "${CLAUDE_PLUGIN_ROOT}"
 ```
 
 The script outputs JSON containing:
 - `skills` - All skills with name, description, category, and sub-agent status
-- `hooks` - All hook scripts and what they protect
+- `agents` - Custom agents with name, description, model, and tools
+- `hooks` - Hook scripts, matchers, and backend groupings
 - `commands` - Traditional commands (if any)
 - `by_category` - Skills grouped by category
 - `summary` - Counts of each primitive type
@@ -46,9 +47,10 @@ Based on $ARGUMENTS, filter the results:
 | "docs" | Show only `by_category.docs` skills |
 | "rag-memory" | Show only `by_category.rag-memory` skills |
 | "devops" | Show only `by_category.devops` skills |
+| "foundation" | Show only `by_category.foundation` skills |
 | "core" | Show only `by_category.core` skills |
-| "hooks" | Show only hooks |
-| "agents" | Show only skills where `is_subagent` is true |
+| "hooks" | Show only hooks (scripts and protected operations by backend) |
+| "agents" | Show only custom agents from `agents` |
 
 ---
 
@@ -64,23 +66,27 @@ Format the JSON output as readable markdown tables:
 |-------|-------------|
 | `/[name]` | [description] |
 
-### For Sub-agents:
+### For Custom Agents:
 
-**Sub-agents ([count])**
+**Custom Agents ([count])**
 
-Skills that run in isolated context:
+Specialized agents available for subagent delegation:
 
-| Sub-agent | Agent Type | Description |
-|-----------|------------|-------------|
-| `/[name]` | [agent_type] | [description] |
+| Agent | Model | Description |
+|-------|-------|-------------|
+| [name] | [model] | [description] |
 
 ### For Hooks:
 
-**Hooks ([count] active)**
+**Hooks ([count] scripts, [count] protected operations)**
 
-| Hook | Protects |
-|------|----------|
-| [name] | [protects] |
+Group by backend from `hooks.by_backend`:
+
+**[Backend Name]**
+
+| Operation | Matcher |
+|-----------|---------|
+| [operation] | [matcher] |
 
 ---
 
@@ -88,7 +94,7 @@ Skills that run in isolated context:
 
 End with:
 
-**Total:** [summary.total_skills] skills ([summary.subagents] sub-agents), [summary.hooks] hooks
+**Total:** [summary.total_skills] skills, [summary.custom_agents] agents, [summary.hook_scripts] hook scripts ([summary.protected_operations] protected operations)
 
 **Quick start:**
 - `/devflow-setup` - Configure your backends

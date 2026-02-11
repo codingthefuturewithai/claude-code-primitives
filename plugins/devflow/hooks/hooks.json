@@ -1,3 +1,249 @@
 {
-  "hooks": {}
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__rag-memory.*__ingest_text",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__rag-memory.*__ingest_url",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__rag-memory.*__ingest_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__rag-memory.*__ingest_directory",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__rag-memory.*__update_document",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__rag-memory.*__delete_document",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__rag-memory.*__create_collection",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__rag-memory.*__delete_collection",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__atlassian__createConfluencePage",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__atlassian__updateConfluencePage",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__atlassian__createConfluenceFooterComment",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__atlassian__createConfluenceInlineComment",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__atlassian__createJiraIssue",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__atlassian__editJiraIssue",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__atlassian__addCommentToJiraIssue",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__atlassian__transitionJiraIssue",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__atlassian__addWorklogToJiraIssue",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__google-drive__upload_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/google-drive-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__google-drive__create_folder",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/google-drive-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__google-drive__create_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/google-drive-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__google-drive__update_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/google-drive-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__gitlab__create_issue",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/gitlab-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__gitlab__update_issue",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/gitlab-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__gitlab__delete_issue",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/gitlab-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__gitlab__create_merge_request",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/gitlab-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__gitlab__update_merge_request",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/gitlab-approval.py"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__gitlab__create_note",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/gitlab-approval.py"
+          }
+        ]
+      }
+    ]
+  }
 }

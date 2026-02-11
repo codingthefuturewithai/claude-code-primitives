@@ -7,15 +7,24 @@ user-invocable: true
 allowed-tools:
   - Bash
   - Read
+  - Write
   - Grep
   - Glob
+  - AskUserQuestion
   - mcp__atlassian__getJiraIssue
   - mcp__atlassian__getAccessibleAtlassianResources
   - mcp__atlassian__transitionJiraIssue
   - mcp__atlassian__getTransitionsForJiraIssue
+  - mcp__atlassian__editJiraIssue
+  - mcp__atlassian__updateConfluencePage
+  - mcp__atlassian__getConfluencePage
   - mcp__gitlab__get_issue
   - mcp__gitlab__update_issue
   - mcp__gitlab__create_merge_request
+  - mcp__rag-memory-primary__search_documents
+  - mcp__rag-memory-primary__update_document
+  - mcp__google-drive__download_file
+  - mcp__google-drive__update_file
 ---
 
 # Complete Work
@@ -122,6 +131,59 @@ git log --oneline [base-branch]...HEAD
 - [What was implemented/fixed]
 - [Key files modified]
 - [How it addresses issue requirements]
+
+---
+
+## Step 3b: Deviation Review (If Project Manifest Exists)
+
+**Check for project manifest:** Read `.devflow/project.md`.
+
+- **If no project manifest exists** → skip to Step 4. Not all projects use upstream PM skills.
+- **If project manifest exists** → proceed with deviation review.
+
+**Compare plan vs implementation using the `deviation-reviewer` agent:**
+
+Use the **`deviation-reviewer`** agent to compare the implementation plan against actual changes. Pass it:
+- **Plan file path:** `.devflow/plans/[ISSUE-KEY].md`
+- **Issue key:** The issue being completed
+- **Base branch:** For computing the diff
+
+The agent reads the plan, analyzes the git diff, and returns a structured deviation report classifying each deviation by type (Technology, Architecture, Scope, Approach) with potential artifact routing.
+
+**If no plan file exists:** The agent still reviews the changes for significant architectural or requirement deviations worth capturing.
+
+Present the agent's deviation report to the developer:
+
+> "I noticed these differences between what was planned and what was built:"
+> 1. [Deviation description] — Is this significant?
+> 2. [Deviation description] — Is this significant?
+
+**Developer responds for each:** Significant / Not significant / Dismiss all
+
+If "Dismiss all" or no significant deviations → skip to Step 4.
+
+---
+
+## Step 3c: Capture Decisions (If Significant Deviations Found)
+
+For each deviation the developer marked as significant, propose where to route the update:
+
+| Deviation Type | Proposed Routing |
+|----------------|-----------------|
+| Feature works differently than issue described | Update tracker issue |
+| Architecture decision changed | New ADR (stored alongside architecture doc) |
+| Pattern or component changed significantly | Architecture doc update |
+| Requirement changed or scope shifted | PRD update (only during active initiative) |
+
+For each item:
+
+> "[Description]. I recommend updating [artifact]. Confirm? (Yes / Skip)"
+
+**Route confirmed updates** to the correct artifact using the project manifest to find locations. Use the appropriate backend tools.
+
+**If no project manifest artifacts are found** for a proposed routing (e.g., no architecture doc stored), note it and move on: "No architecture doc found in project manifest. Consider recording this decision elsewhere."
+
+After processing all items, proceed to Step 4.
 
 ---
 

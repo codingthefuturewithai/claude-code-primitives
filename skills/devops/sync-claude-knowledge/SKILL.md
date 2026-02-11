@@ -13,23 +13,13 @@ allowed-tools:
   - WebSearch
   - Task
   - AskUserQuestion
-  - mcp__rag-memory__search_documents
-  - mcp__rag-memory__list_collections
-  - mcp__rag-memory__ingest_text
-  - mcp__rag-memory__update_document
-  - mcp__rag-memory__get_document_by_id
-  - mcp__rag-memory__list_documents
-  - mcp__rag-memory__get_collection_info
-hooks:
-  PreToolUse:
-    - matcher: "mcp__rag-memory__ingest_text"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
-    - matcher: "mcp__rag-memory__update_document"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
+  - mcp__rag-memory-primary__search_documents
+  - mcp__rag-memory-primary__list_collections
+  - mcp__rag-memory-primary__ingest_text
+  - mcp__rag-memory-primary__update_document
+  - mcp__rag-memory-primary__get_document_by_id
+  - mcp__rag-memory-primary__list_documents
+  - mcp__rag-memory-primary__get_collection_info
 ---
 
 # Sync Claude Code Knowledge

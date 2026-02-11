@@ -5,15 +5,9 @@ argument-hint: ""
 disable-model-invocation: true
 user-invocable: true
 allowed-tools:
-  - mcp__rag-memory__create_collection
-  - mcp__rag-memory__list_collections
-  - mcp__rag-memory__get_collection_info
-hooks:
-  PreToolUse:
-    - matcher: "mcp__rag-memory__create_collection"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
+  - mcp__rag-memory-primary__create_collection
+  - mcp__rag-memory-primary__list_collections
+  - mcp__rag-memory-primary__get_collection_info
 ---
 
 # Create Agent Preferences Collection
@@ -63,7 +57,7 @@ Proceed to Step 2.
 Create the `agent-preferences` collection with the following parameters:
 
 ```
-mcp__rag-memory__create_collection(
+mcp__rag-memory-primary__create_collection(
     name="agent-preferences",
     description="Learn from user decisions to improve future recommendations. Tracks routing choices, topic extraction patterns, quality thresholds, and workflow preferences.",
     domain="Agent Learning",

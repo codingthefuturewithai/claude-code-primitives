@@ -15,12 +15,6 @@ allowed-tools:
   - mcp__atlassian__getConfluencePageDescendants
   - mcp__atlassian__updateConfluencePage
   - AskUserQuestion
-hooks:
-  PreToolUse:
-    - matcher: "mcp__atlassian__updateConfluencePage"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
 ---
 
 # Product Roadmap Management

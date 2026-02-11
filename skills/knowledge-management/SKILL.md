@@ -2,40 +2,6 @@
 name: devflow:knowledge-management
 description: Intelligent workflow for storing and organizing external knowledge. Use this skill when the user asks to store, remember, capture, or preserve any information externally or mentions saving to a knowledge base.
 user-invocable: true
-hooks:
-  PreToolUse:
-    - matcher: "mcp__rag-memory__ingest_text"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
-    - matcher: "mcp__rag-memory__ingest_url"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
-    - matcher: "mcp__rag-memory__ingest_file"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
-    - matcher: "mcp__rag-memory__ingest_directory"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
-    - matcher: "mcp__rag-memory__update_document"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
-    - matcher: "mcp__rag-memory__delete_document"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
-    - matcher: "mcp__rag-memory__create_collection"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
-    - matcher: "mcp__rag-memory__delete_collection"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
 ---
 
 # Knowledge Management
@@ -168,7 +134,7 @@ For EVERY parameter on EVERY call, verify where the value came from:
 ## Step 2: Check Backend Availability
 
 **If RAG_ENABLED:**
-Test: `mcp__rag-memory__list_collections`
+Test: `mcp__rag-memory-primary__list_collections`
 - Success → RAG available
 - Failure → RAG unavailable
 

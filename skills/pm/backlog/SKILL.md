@@ -17,16 +17,6 @@ allowed-tools:
   - mcp__atlassian__getVisibleJiraProjects
   - mcp__atlassian__getJiraProjectIssueTypesMetadata
   - mcp__atlassian__getTransitionsForJiraIssue
-hooks:
-  PreToolUse:
-    - matcher: "mcp__atlassian__createJiraIssue"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
-    - matcher: "mcp__atlassian__editJiraIssue"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
 ---
 
 # JIRA Backlog Management

@@ -11,33 +11,7 @@ allowed-tools:
   - mcp__atlassian__getAccessibleAtlassianResources
   - mcp__gitlab__list_projects
   - mcp__google-drive__search_files
-  - mcp__rag-memory__list_collections
-hooks:
-  PreToolUse:
-    - matcher: "mcp__google-drive__upload_file"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/google-drive-approval.py"
-    - matcher: "mcp__google-drive__create_folder"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/google-drive-approval.py"
-    - matcher: "mcp__atlassian__createConfluencePage"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
-    - matcher: "mcp__atlassian__updateConfluencePage"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
-    - matcher: "mcp__atlassian__createConfluenceFooterComment"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
-    - matcher: "mcp__atlassian__createConfluenceInlineComment"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
+  - mcp__rag-memory-primary__list_collections
 ---
 
 # DevFlow Setup

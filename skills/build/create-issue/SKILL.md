@@ -17,16 +17,6 @@ allowed-tools:
   - mcp__gitlab__create_issue
   - mcp__context7__resolve-library-id
   - mcp__context7__get-library-docs
-hooks:
-  PreToolUse:
-    - matcher: "mcp__gitlab__create_issue"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/gitlab-approval.py"
-    - matcher: "mcp__atlassian__createJiraIssue"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/atlassian-approval.py"
 ---
 
 # Create Issue

@@ -7,15 +7,9 @@ user-invocable: true
 allowed-tools:
   - Read
   - AskUserQuestion
-  - mcp__rag-memory__list_collections
-  - mcp__rag-memory__create_collection
-  - mcp__rag-memory__get_collection_info
-hooks:
-  PreToolUse:
-    - matcher: "mcp__rag-memory__create_collection"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/hooks/rag-memory-approval.py"
+  - mcp__rag-memory-primary__list_collections
+  - mcp__rag-memory-primary__create_collection
+  - mcp__rag-memory-primary__get_collection_info
 ---
 
 # Setup Collections - RAG Memory Collection Scaffold
@@ -24,9 +18,9 @@ You are helping a user set up their RAG Memory collections with a minimal, durab
 
 ## Critical Instructions
 
-- **Always check current state first** - Use `mcp__rag-memory__list_collections()` before doing anything
+- **Always check current state first** - Use `mcp__rag-memory-primary__list_collections()` before doing anything
 - **Don't create automatically** - If collections exist, ask the user what they want to do
-- **Use MCP tools directly** - Create collections via `mcp__rag-memory__create_collection`
+- **Use MCP tools directly** - Create collections via `mcp__rag-memory-primary__create_collection`
 - **Keep it simple** - Propose a small set of durable collections, not many narrow ones
 - **Include routing hints at creation** - Pass routing hints via `metadata_schema` parameter when calling `create_collection`
 - **Do NOT create agent-preferences** - The `agent-preferences` collection is auto-created by the MCP server on startup
@@ -38,7 +32,7 @@ You are helping a user set up their RAG Memory collections with a minimal, durab
 **Always start here:**
 
 ```
-mcp__rag-memory__list_collections()
+mcp__rag-memory-primary__list_collections()
 ```
 
 ### If collections exist:
@@ -130,7 +124,7 @@ Once the user confirms, create each collection using the exact names and purpose
 ### Collection: knowledge-and-reference
 
 ```
-mcp__rag-memory__create_collection(
+mcp__rag-memory-primary__create_collection(
     name="knowledge-and-reference",
     description="External documentation and reference material (library docs, frameworks, official docs, standards, manuals)",
     domain="Engineering",
@@ -157,7 +151,7 @@ mcp__rag-memory__create_collection(
 ### Collection: projects
 
 ```
-mcp__rag-memory__create_collection(
+mcp__rag-memory-primary__create_collection(
     name="projects",
     description="Work-in-progress contexts (project notes, plans, drafts, links related to things being built or explored)",
     domain="Project",
@@ -184,7 +178,7 @@ mcp__rag-memory__create_collection(
 ### Collection: practices-and-procedures
 
 ```
-mcp__rag-memory__create_collection(
+mcp__rag-memory-primary__create_collection(
     name="practices-and-procedures",
     description="Stable ways of working (SOPs, checklists, playbooks, principles, workflows, rules)",
     domain="Operations",
@@ -211,7 +205,7 @@ mcp__rag-memory__create_collection(
 ### Collection: people-and-relationships
 
 ```
-mcp__rag-memory__create_collection(
+mcp__rag-memory-primary__create_collection(
     name="people-and-relationships",
     description="Person-centric notes (who someone is, context about people, preferences, history)",
     domain="Personal",
@@ -238,7 +232,7 @@ mcp__rag-memory__create_collection(
 ### Collection: inbox-unsorted
 
 ```
-mcp__rag-memory__create_collection(
+mcp__rag-memory-primary__create_collection(
     name="inbox-unsorted",
     description="Temporary holding for uncategorized items; meant to be reviewed and refiled later",
     domain="Intake",
@@ -262,7 +256,7 @@ mcp__rag-memory__create_collection(
 ### Collection: business-operations (if requested)
 
 ```
-mcp__rag-memory__create_collection(
+mcp__rag-memory-primary__create_collection(
     name="business-operations",
     description="Accounting/finance exports, vendors, client operations, business strategy, internal business procedures",
     domain="Business",
@@ -298,7 +292,7 @@ Report each success as you create them:
 After creation, verify:
 
 ```
-mcp__rag-memory__list_collections()
+mcp__rag-memory-primary__list_collections()
 ```
 
 Show the user their new setup in a simple table:
